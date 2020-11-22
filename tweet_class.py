@@ -26,6 +26,9 @@ class Tweet:
 
     Representation Invariants:
         - self.state in states
+        - [h[0] == '#' h for h in self.hashtags]
+
+    >>> tweet = Tweet({'#climatechange', '#climatechangehoax', '#globalwarming'}, 'CA', datetime.date(2015, 9, 14))
     """
 
     hashtags: Set[str]
