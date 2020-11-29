@@ -174,13 +174,14 @@ def filter_tweets() -> None:
     list of the tweet objects. If you need this functionailty, simply uncomment this code and edit
     the type contract.
     """
-    f = open("rehydrate_02.json", "w")
+    f = open("Datasets/Samples/sampleHarvardProcessedTweets.jsonl", "w")
     # tweet_list = []
 
-    for tweet in t.hydrate(open('climate_id.txt.02')):
+    for tweet in t.hydrate(open('Datasets/Samples/sampleHarvardTwitterIDs.txt')):
         temp_location = tweet["user"]["location"]
+        retweet = tweet["full_text"][:2]
 
-        if any(state in temp_location for state in states):
+        if any(state in temp_location for state in states) and retweet != "RT":
             new_loc = get_location(temp_location)
             temp_date = get_date(tweet["created_at"])
             temp_hashtags = set()
@@ -191,8 +192,46 @@ def filter_tweets() -> None:
 
             # convert tweets to json
             json_tweet = json.dumps(temp_tweet.__dict__, sort_keys=True, default=str)
-            f.write(str(json_tweet))
+            f.write(str(json_tweet) + "\n")
             # tweet_list.append(tweet_class.Tweet(tweet["full_text"],
             #                                     temp_hashtags, new_loc, temp_date))
     f.close()
     # return tweet_list
+
+
+def process_json_date(date: str):
+    date_list = str.split(date, '-')
+    if date_list[1][0] == '0':
+        date_list[1] = date_list[1][1]
+
+    if date_list[2][0] == '0':
+        date_list[2] = date_list[2][1]
+
+    return datetime.date(int(date_list[0]), int(date_list[1]), int(date_list[2]))
+
+
+def process_json_hashtags(hashstring: str):
+    if hashstring == 'set()':
+        return set()
+    else:
+        tag_list = str.split(hashstring, "\'")
+        tag_final_list = set()
+        for index in range(0, len(tag_list)):
+            if index % 2 == 1:
+                tag_final_list.add(tag_list[index])
+
+    return tag_final_list
+
+
+def json_to_tweets():
+    tweet_list = []
+    with open('Datasets/Samples/sampleHarvardProcessedTweets.jsonl') as f:
+        for jsonObj in f:
+            tweet_dict = json.loads(jsonObj)
+            temp_date = process_json_date(tweet_dict['date'])
+            temp_hashtags = process_json_hashtags(tweet_dict['hashtags'])
+            tweet_list.append(tweet_class.Tweet(tweet_dict['text'], temp_hashtags,
+                                                tweet_dict['state'], temp_date))
+    return tweet_list
+
+

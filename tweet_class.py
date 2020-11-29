@@ -31,6 +31,7 @@ class Tweet:
     >>> tweet = Tweet({'#climatechange', '#climatechangehoax', '#globalwarming'}, 'CA', datetime.date(2015, 9, 14))
     """
 
+    text: str
     hashtags: Set[str]
     state: str
     date: datetime.date
