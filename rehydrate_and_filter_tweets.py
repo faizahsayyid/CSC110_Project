@@ -40,107 +40,22 @@ states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DC", "DE", "FL", "GA",
           'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington',
           'West Virginia', 'Wisconsin', 'Wyoming']
 
-states_dict = {'AL': 'AL',
-               'AK': 'AK',
-               'AZ': 'AZ',
-               'AR': 'AR',
-               'CA': 'CA',
-               'CO': 'CO',
-               'CT': 'CT',
-               'DC': 'DC',
-               'DE': 'DE',
-               'FL': 'FL',
-               'GA': 'GA',
-               'HI': 'HI',
-               'ID': 'ID',
-               'IL': 'IL',
-               'IN': 'IN',
-               'IA': 'IA',
-               'KS': 'KS',
-               'KY': 'KY',
-               'LA': 'LA',
-               'ME': 'ME',
-               'MD': 'MD',
-               'MA': 'MA',
-               'MI': 'MI',
-               'MN': 'MN',
-               'MS': 'MS',
-               'MO': 'MO',
-               'MT': 'MT',
-               'NE': 'NE',
-               'NV': 'NV',
-               'NH': 'NH',
-               'NJ': 'NJ',
-               'NM': 'NM',
-               'NY': 'NY',
-               'NC': 'NC',
-               'ND': 'ND',
-               'OH': 'OH',
-               'OK': 'OK',
-               'OR': 'OR',
-               'PA': 'PA',
-               'RI': 'RI',
-               'SC': 'SC',
-               'SD': 'SD',
-               'TN': 'TN',
-               'TX': 'TX',
-               'UT': 'UT',
-               'VT': 'VT',
-               'VA': 'VA',
-               'WA': 'WA',
-               'WV': 'WV',
-               'WI': 'WI',
-               'WY': 'WY',
-               'Alabama': 'AL',
-               'Alaska': 'AK',
-               'Arizona': 'AZ',
-               'Arkansas': 'AR',
-               'California': 'CA',
-               'Colorado': 'CO',
-               'Connecticut': 'CT',
-               'Delaware': 'DC',
-               'Florida': 'DE',
-               'Georgia': 'FL',
-               'Hawaii': 'GA',
-               'Idaho': 'HI',
-               'Illinois': 'ID',
-               'Indiana': 'IL',
-               'Iowa': 'IN',
-               'Kansas': 'IA',
-               'Kentucky': 'KS',
-               'Louisiana': 'KY',
-               'Maine': 'LA',
-               'Maryland': 'ME',
-               'Massachusetts': 'MD',
-               'Michigan': 'MA',
-               'Minnesota': 'MI',
-               'Mississippi': 'MN',
-               'Missouri': 'MS',
-               'Montana': 'MO',
-               'Nebraska': 'MT',
-               'Nevada': 'NE',
-               'New Hampshire': 'NV',
-               'New Jersey': 'NH',
-               'New Mexico': 'NJ',
-               'New York': 'NM',
-               'North Carolina': 'NY',
-               'North Dakota': 'NC',
-               'Ohio': 'ND',
-               'Oklahoma': 'OH',
-               'Oregon': 'OK',
-               'Pennsylvania': 'OR',
-               'Rhode Island': 'PA',
-               'South Carolina': 'RI',
-               'South Dakota': 'SC',
-               'Tennessee': 'SD',
-               'Texas': 'TN',
-               'Utah': 'TX',
-               'Vermont': 'UT',
-               'Virginia': 'VT',
-               'Washington': 'VA',
-               'West Virginia': 'WA',
-               'Wisconsin': 'WV',
-               'Wyoming': 'WI'}
+states_dict = {'AL': 'AL', 'AK': 'AK', 'AZ': 'AZ', 'AR': 'AR', 'CA': 'CA', 'CO': 'CO', 'CT': 'CT', 'DE': 'DE',
+               'FL': 'FL', 'GA': 'GA', 'HI': 'HI', 'ID': 'ID', 'IL': 'IL', 'IN': 'IN', 'IA': 'IA', 'KS': 'KS',
+               'KY': 'KY', 'LA': 'LA', 'ME': 'ME', 'MD': 'MD', 'MA': 'MA', 'MI': 'MI', 'MN': 'MN', 'MS': 'MS',
+               'MO': 'MO', 'MT': 'MT', 'NE': 'NE', 'NV': 'NV', 'NH': 'NH', 'NJ': 'NJ', 'NM': 'NM', 'NY': 'NY',
+               'NC': 'NC', 'ND': 'ND', 'OH': 'OH', 'OK': 'OK', 'OR': 'OR', 'PA': 'PA', 'RI': 'RI', 'SC': 'SC',
+               'SD': 'SD', 'TN': 'TN', 'TX': 'TX', 'UT': 'UT', 'VT': 'VT', 'VA': 'VA', 'WA': 'WA', 'WV': 'WV',
+               'WI': 'WI', 'WY': 'WY', 'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
+               'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA', 'Hawaii': 'HI',
+               'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA', 'Kansas': 'KS', 'Kentucky': 'KY',
+               'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD', 'Massachusetts': 'MA', 'Michigan': 'MI',
+               'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO', 'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV',
+               'New Hampshire': 'NH', 'New Jersey': 'NJ', 'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC',
+               'North Dakota': 'ND', 'Ohio': 'OH', 'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA',
+               'Rhode Island': 'RI', 'South Carolina': 'SC', 'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX',
+               'Utah': 'UT', 'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV',
+               'Wisconsin': 'WI', 'Wyoming': 'WY'}
 
 months = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, "Jul": 7, "Aug": 8, "Sep": 9,
           "Oct": 10, "Nov": 11, "Dec": 12}
@@ -164,7 +79,7 @@ def get_location(location: str):
     return -2
 
 
-def filter_tweets() -> None:
+def filter_tweets(input_file: str, output_file: str) -> None:
     """ This function reads a "dehydrated" list of tweet ids from the given file and dehydrates
     and filters these tweets based on location. If the tweet's location is in a specific US state,
     the tweet will be written to the given output file as a tweet object, with the Tweet's full
@@ -174,10 +89,10 @@ def filter_tweets() -> None:
     list of the tweet objects. If you need this functionailty, simply uncomment this code and edit
     the type contract.
     """
-    f = open("Datasets/Samples/sampleHarvardProcessedTweets.jsonl", "w")
+    f = open(output_file, "w")
     # tweet_list = []
 
-    for tweet in t.hydrate(open('Datasets/Samples/sampleHarvardTwitterIDs.txt')):
+    for tweet in t.hydrate(open(input_file)):
         temp_location = tweet["user"]["location"]
         retweet = tweet["full_text"][:2]
 
@@ -200,38 +115,60 @@ def filter_tweets() -> None:
 
 
 def process_json_date(date: str):
+    """ Takes a date in from the json file in the format year-month-day (ex. 2018-08-13)
+    and returns the date as a datetime.date object.
+
+    >>> process_json_date("2018-08-13")
+    datetime.date(2018, 8, 13)
+    """
+    # Split string in to a list
     date_list = str.split(date, '-')
+
+    # Checks for a 0 before the day or month and removes it, for example "08" -> "8"
     if date_list[1][0] == '0':
         date_list[1] = date_list[1][1]
 
     if date_list[2][0] == '0':
         date_list[2] = date_list[2][1]
 
+    # Returns final date in datetime formatting
     return datetime.date(int(date_list[0]), int(date_list[1]), int(date_list[2]))
 
 
 def process_json_hashtags(hashstring: str):
+    """ Takes a string of hashtags in the format "{'hash_tag_name', 'hash_tag_name_2'}"
+    and returns the hashtags as a set.
+
+    >>> process_json_hashtags("{'climatechange', 'spaceweather'}")
+    {'climatechange', 'spaceweather'}
+    >>> process_json_hashtags("set()")
+    set()
+    """
+    # Checks if hashtag set is empty.
     if hashstring == 'set()':
         return set()
+    # Otherwise processes hashtags to put them in a set
     else:
+        # Split hashtags in to a list based on the ' character
         tag_list = str.split(hashstring, "\'")
-        tag_final_list = set()
-        for index in range(0, len(tag_list)):
-            if index % 2 == 1:
-                tag_final_list.add(tag_list[index])
+
+        # Create the final hashtag list. The formatting ensures that a hashtag is stored
+        # for only odd indices of the list, which the expression i % 2 == 1 checks for
+        tag_final_list = {tag_list[i] for i in range(0, len(tag_list)) if i % 2 == 1}
 
     return tag_final_list
 
 
-def json_to_tweets():
+def json_to_tweets(input_file: str):
+    """ Takes a json or jsonl file with json objects containing individual tweets and returns the list of
+    tweet objects
+    """
     tweet_list = []
-    with open('Datasets/Samples/sampleHarvardProcessedTweets.jsonl') as f:
-        for jsonObj in f:
-            tweet_dict = json.loads(jsonObj)
+    with open(input_file) as f:
+        for json_obj in f:
+            tweet_dict = json.loads(json_obj)
             temp_date = process_json_date(tweet_dict['date'])
             temp_hashtags = process_json_hashtags(tweet_dict['hashtags'])
             tweet_list.append(tweet_class.Tweet(tweet_dict['text'], temp_hashtags,
                                                 tweet_dict['state'], temp_date))
     return tweet_list
-
-
