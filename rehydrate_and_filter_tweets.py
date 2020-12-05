@@ -233,5 +233,3 @@ def json_to_tweets():
             tweet_list.append(tweet_class.Tweet(tweet_dict['text'], temp_hashtags,
                                                 tweet_dict['state'], temp_date))
     return tweet_list
-
-
