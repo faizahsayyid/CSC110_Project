@@ -2,14 +2,15 @@
 
 Module Description
 ==================
-This module contains the functions for finding all keywords in a list of tweets, and sorting them based on
-the number of time they occur.
+This module contains the functions for finding all keywords in a list of tweets, and sorting them
+based on the number of time they occur.
 
 Copyright and Usage Information
 ===============================
 This file is provided solely for the personal and private use of Faizah Sayyid, Tina Zhang,
-Poorvi Sharma, and Courtney Amm (students at the University of Toronto St. George campus). All forms
-of distribution of this code, whether as given or with any changes, are expressly prohibited.
+Poorvi Sharma, and Courtney Amm (students at the University of Toronto St. George campus).
+All forms of distribution of this code, whether as given or with any changes, are expressly
+prohibited.
 
 This file is Copyright (c) 2020 Faizah Sayyid, Tina Zhang, Poorvi Sharma, and Courtney Amm.
 """
@@ -21,8 +22,8 @@ from typing import List, Dict, Tuple, Any
 from rehydrate_and_filter_tweets import json_to_tweets
 from pprint import pprint
 
-PUNCTUATION = ['.', ',', '!', '?', ';', ':', "'", '‘', '’', '“', '``', "''", '-', '”', '&', '/', '#', '|', '--', ')',
-               '(', '*', '....', '=']
+PUNCTUATION = ['.', ',', '!', '?', ';', ':', "'", '‘', '’', '“', '``', "''", '-', '”', '&', '/',
+               '#', '|', '--', ')', '(', '*', '....', '=']
 
 OTHER = ['@', 'https', "'s", 'u', '...', '..', '%', '$', '—', '–', '\u2066', "'ve", "'re", "'m",
          "n't", 'the…']
@@ -48,13 +49,16 @@ def hashtags_to_data_points(tweets: List[Tweet], num_key_hashtags: int) -> \
     return data_points_dict_so_far
 
 
-def data_points_hashtag(tweets: List[Tweet], hashtag: str) -> Tuple[List[str], List[str], List[int]]:
-    """Return a list of lists where each corresponding index in the lists counts as one data point for a plotly map
-    animation that displays number of occurrences of the search_phrase for each state over time.
+def data_points_hashtag(tweets: List[Tweet], hashtag: str) \
+        -> Tuple[List[str], List[str], List[int]]:
+    """Return a list of lists where each corresponding index in the lists counts as one data point
+    for a plotly map animation that displays number of occurrences of the search_phrase for each
+    state over time.
 
         - First list (element 0): list of the dates
         - Second list (element 1): list of the states
-        - Third list (element 2): list of the popularity of the hashtag for the corresponding date and state
+        - Third list (element 2): list of the popularity of the hashtag for the
+                                    corresponding date and state
     """
     d_s_to_hashtag_pop = date_state_to_hashtag_pop(tweets, hashtag)
 
@@ -62,8 +66,8 @@ def data_points_hashtag(tweets: List[Tweet], hashtag: str) -> Tuple[List[str], L
 
 
 def date_state_to_hashtag_pop(tweets: List[Tweet], hashtag: str) -> Dict[Tuple[str, str], int]:
-    """Return a dictionary where the keys are a tuples of dates and states (dates are strings), and the
-    corresponding values is the popularity of the given hashtag in that state at that time
+    """Return a dictionary where the keys are a tuples of dates and states (dates are strings),
+    and the corresponding values is the popularity of the given hashtag in that state at that time
     """
     d_s_to_hashtag_pop = {}
 
@@ -99,9 +103,11 @@ def key_phrases_to_data_points(tweets: List[Tweet], num_key_phrases: int) -> \
     return data_points_dict_so_far
 
 
-def data_points_key_phrase(tweets: List[Tweet], search_phrase) -> Tuple[List[str], List[str], List[int]]:
-    """Return a list of lists where each corresponding index in the lists counts as one data point for a plotly map
-    animation that displays number of occurrences of the search_phrase for each state over time.
+def data_points_key_phrase(tweets: List[Tweet], search_phrase) \
+        -> Tuple[List[str], List[str], List[int]]:
+    """Return a list of lists where each corresponding index in the lists counts as one data point
+    for a plotly map animation that displays number of occurrences of the search_phrase for each
+    state over time.
 
         - First list (element 0): list of the dates
         - Second list (element 1): list of the states
@@ -112,10 +118,11 @@ def data_points_key_phrase(tweets: List[Tweet], search_phrase) -> Tuple[List[str
     return data_points(d_s_to_occs)
 
 
-def date_state_to_phrase_occurrences(tweets: List[Tweet], search_phrase: tuple) -> Dict[Tuple[str, str], int]:
-    """Return a dictionary where the keys are a tuples of dates and states (dates are strings), and the
-    corresponding values are the number of times the search_phrase occurs in every tweet that was tweeted
-    on that date and in that state
+def date_state_to_phrase_occurrences(tweets: List[Tweet], search_phrase: tuple) \
+        -> Dict[Tuple[str, str], int]:
+    """Return a dictionary where the keys are a tuples of dates and states (dates are strings),
+    and the corresponding values are the number of times the search_phrase occurs in every tweet
+    that was tweeted on that date and in that state
     """
     d_s_to_occs_so_far = {}
 
@@ -279,8 +286,8 @@ def find_key_phrases(tweets: List[Tweet], num_keyphrases: int) -> List[tuple]:
 def tweets_to_words(tweets: List[Tweet]) -> List[str]:
     """Return a words in the text of a tweets where each word is separated into a list of string
 
-    Excludes words such as 'and', 'the', 'as', 'he', 'her', etc (provided by nltk.corpus.stopwords) in
-    returned list. Also does not include punctuation.
+    Excludes words such as 'and', 'the', 'as', 'he', 'her', etc (provided by nltk.corpus.stopwords)
+    in returned list. Also does not include punctuation.
     """
     # ACCUMULATOR words_so_far keeps track of the words in the tweet
     words_so_far = []
@@ -319,12 +326,14 @@ def get_nouns(words: List[str]) -> List[str]:
     """Return a list of all the nouns from the given words"""
     tagged_words = nltk.pos_tag(words)
 
-    return [tagged_word[0] for tagged_word in tagged_words if tagged_word[1] == 'NN' or tagged_word[1] == 'NNS']
+    return [tagged_word[0] for tagged_word in tagged_words
+            if tagged_word[1] == 'NN' or tagged_word[1] == 'NNS']
 
 
 def keys_to_freq(keys: List[Any]) -> Dict[Any, int]:
-    """Return a dictionary where the keys are all the unique values in keys, the values and the frequencies of
-    each key in keys the number of time each key in keys appears to phrase counts"""
+    """Return a dictionary where the keys are all the unique values in keys, the values and the
+    frequencies of each key in keys the number of time each key in keys appears to phrase counts
+    """
 
     key_freqs_so_far = {}
 
@@ -367,7 +376,8 @@ def get_relative_frequencies(words: List[str]) -> List[Tuple[float, tuple]]:
 
     # Get the frequencies of all the unigrams (only the nouns) and add it to scored_phrases_so_far
     unigram_freq_dict = keys_to_freq(get_nouns(words))
-    unigram_freq_dict = {tuple([unigram]): unigram_freq_dict[unigram] for unigram in unigram_freq_dict}
+    unigram_freq_dict = {tuple([unigram]): unigram_freq_dict[unigram]
+                         for unigram in unigram_freq_dict}
     scored_phrases_so_far.extend(dict_to_tuple_list(unigram_freq_dict))
 
     # Get the frequencies of all the bigrams and trigrams, and add them to scored_phrases_so_far
@@ -398,7 +408,8 @@ def list_tuple_to_list_str(list_of_tuple: List[tuple]) -> List[str]:
 # ==================================================================================================
 
 def run_example() -> None:
-    """ Example of find_key_phrases on the file:  Year/Fall 2020/csc110/assignments/CSC110_Project/Datasets/Samples
+    """ Example of find_key_phrases on the file:
+                Year/Fall 2020/csc110/assignments/CSC110_Project/Datasets/Samples
     """
     tweets = json_to_tweets()
     key_phrases_tuples = find_key_phrases(tweets, 30)
