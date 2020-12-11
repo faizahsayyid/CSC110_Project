@@ -4,6 +4,14 @@ Module Description
 ==================
 This module contains the functions for finding all keywords in a list of tweets, and sorting them based on
 the number of time they occur.
+
+Copyright and Usage Information
+===============================
+This file is provided solely for the personal and private use of Faizah Sayyid, Tina Zhang,
+Poorvi Sharma, and Courtney Amm (students at the University of Toronto St. George campus). All forms
+of distribution of this code, whether as given or with any changes, are expressly prohibited.
+
+This file is Copyright (c) 2020 Faizah Sayyid, Tina Zhang, Poorvi Sharma, and Courtney Amm.
 """
 import nltk
 from nltk import collocations
@@ -15,33 +23,96 @@ from pprint import pprint
 
 PUNCTUATION = ['.', ',', '!', '?', ';', ':', "'", '‘', '’', '“', '``', "''", '-', '”', '&', '/', '#', '|', '--', ')',
                '(', '*', '....', '=']
+
 OTHER = ['@', 'https', "'s", 'u', '...', '..', '%', '$', '—', '–', '\u2066', "'ve", "'re", "'m",
          "n't", 'the…']
 
 
-def lists_of_dates_states_occurrences(tweets: List[Tweet], search_phrase) -> Tuple[List[str], List[str], List[int]]:
-    """Return a list of lists where each corresponding index
+# ==================================================================================================
+# Functions for getting the data points for our plotly graph (for hashtags)
+# ==================================================================================================
+
+def hashtags_to_data_points(tweets: List[Tweet], num_key_hashtags: int) -> \
+        Dict[str, Tuple[List[str], List[str], List[int]]]:
+    """Return a dictionary where the keys are the key hashtags from the tweets and the values are
+    the data points corresponding to that hashtag.
+    """
+
+    key_hashtags = find_key_hashtags(tweets, num_key_hashtags)
+
+    data_points_dict_so_far = {}
+
+    for hashtag in key_hashtags:
+        data_points_dict_so_far['#' + hashtag] = data_points_hashtag(tweets, hashtag)
+
+    return data_points_dict_so_far
+
+
+def data_points_hashtag(tweets: List[Tweet], hashtag: str) -> Tuple[List[str], List[str], List[int]]:
+    """Return a list of lists where each corresponding index in the lists counts as one data point for a plotly map
+    animation that displays number of occurrences of the search_phrase for each state over time.
+
+        - First list (element 0): list of the dates
+        - Second list (element 1): list of the states
+        - Third list (element 2): list of the popularity of the hashtag for the corresponding date and state
+    """
+    d_s_to_hashtag_pop = date_state_to_hashtag_pop(tweets, hashtag)
+
+    return data_points(d_s_to_hashtag_pop)
+
+
+def date_state_to_hashtag_pop(tweets: List[Tweet], hashtag: str) -> Dict[Tuple[str, str], int]:
+    """Return a dictionary where the keys are a tuples of dates and states (dates are strings), and the
+    corresponding values is the popularity of the given hashtag in that state at that time
+    """
+    d_s_to_hashtag_pop = {}
+
+    for tweet in tweets:
+        date_state = (tweet.date, tweet.state)
+
+        if hashtag in tweet.hashtags:
+            if date_state in d_s_to_hashtag_pop:
+                d_s_to_hashtag_pop[date_state] += 1
+            else:
+                d_s_to_hashtag_pop[date_state] = 1
+
+    return d_s_to_hashtag_pop
+
+
+# ==================================================================================================
+# Functions for getting the data points for our plotly graph (for key phrases)
+# ==================================================================================================
+
+def key_phrases_to_data_points(tweets: List[Tweet], num_key_phrases: int) -> \
+        Dict[str, Tuple[List[str], List[str], List[int]]]:
+    """Return a dictionary where the keys are the key phrases from the tweets and the values are
+    the data points corresponding to that key phrase.
+    """
+    data_points_dict_so_far = {}
+
+    key_phrases = find_key_phrases(tweets, num_key_phrases)
+
+    for phrase in key_phrases:
+        str_phrase = ' '.join(phrase)
+        data_points_dict_so_far[str_phrase] = data_points_key_phrase(tweets, phrase)
+
+    return data_points_dict_so_far
+
+
+def data_points_key_phrase(tweets: List[Tweet], search_phrase) -> Tuple[List[str], List[str], List[int]]:
+    """Return a list of lists where each corresponding index in the lists counts as one data point for a plotly map
+    animation that displays number of occurrences of the search_phrase for each state over time.
 
         - First list (element 0): list of the dates
         - Second list (element 1): list of the states
         - Third list (element 2): list of the # of occurrences
     """
-    d_s_to_occs = date_state_to_occurrences(tweets, search_phrase)
-    sorted_keys = sorted(list(d_s_to_occs.keys()))
+    d_s_to_occs = date_state_to_phrase_occurrences(tweets, search_phrase)
 
-    list_of_states = []
-    list_of_dates = []
-    list_of_occurrences = []
-
-    for key in sorted_keys:
-        list_of_states.append(key[0])
-        list_of_dates.append(key[1])
-        list_of_occurrences.append(d_s_to_occs[key])
-
-    return (list_of_dates, list_of_states, list_of_occurrences)
+    return data_points(d_s_to_occs)
 
 
-def date_state_to_occurrences(tweets: List[Tweet], search_phrase: tuple) -> Dict[Tuple[str, str], int]:
+def date_state_to_phrase_occurrences(tweets: List[Tweet], search_phrase: tuple) -> Dict[Tuple[str, str], int]:
     """Return a dictionary where the keys are a tuples of dates and states (dates are strings), and the
     corresponding values are the number of times the search_phrase occurs in every tweet that was tweeted
     on that date and in that state
@@ -58,8 +129,35 @@ def date_state_to_occurrences(tweets: List[Tweet], search_phrase: tuple) -> Dict
     return d_s_to_occs_so_far
 
 
+# ==================================================================================================
+# Helper function for converting a Dict[Tuple[str, str], int] from date_state_to_phrase_occurrences
+# and date_state_to_hashtag_pop into data points for plotly
+# ==================================================================================================
+
+def data_points(data_dict: Dict[Tuple[str, str], int]) -> Tuple[List[str], List[str], List[int]]:
+    """Return a tuple of lists for the given data that corresponds to format plotly needs for a
+    map graph animation
+    """
+    sorted_keys = sorted(list(data_dict.keys()))
+
+    listed_data_1 = []
+    listed_data_2 = []
+    listed_data_3 = []
+
+    for key in sorted_keys:
+        listed_data_1.append(key[0])
+        listed_data_2.append(key[1])
+        listed_data_3.append(data_dict[key])
+
+    return (listed_data_1, listed_data_2, listed_data_3)
+
+
+# ==================================================================================================
+# Function for finding the number of times a a phrase occurs in a tweet
+# ==================================================================================================
+
 def phrase_occurences_in_tweet(tweet: Tweet, search_phrase: tuple) -> int:
-    """Return whether phrase is in the text
+    """Return number of times a a phrase occurs in a tweet
 
     Phrases includes:
     - uni-grams - single words
@@ -109,10 +207,10 @@ def phrase_occurences_in_tweet(tweet: Tweet, search_phrase: tuple) -> int:
 # Function for finding key hashtags
 # ==================================================================================================
 
-def find_key_hashtags(tweets: List[Tweet], num_wanted: int) -> List[str]:
+def find_key_hashtags(tweets: List[Tweet], num_key_hashtags: int) -> List[str]:
     """Return a list of the key hashtags with length num_wanted"""
 
-    wanted_key_hashtags = sorted_hashtag_freq(tweets)[:num_wanted]
+    wanted_key_hashtags = sorted_hashtag_freq(tweets)[:num_key_hashtags]
 
     return [x[1] for x in wanted_key_hashtags]
 
@@ -299,16 +397,6 @@ def list_tuple_to_list_str(list_of_tuple: List[tuple]) -> List[str]:
 # Example
 # ==================================================================================================
 
-def run_example_find_deniers() -> None:
-    """ Example of find_key_phrases on the file:  Year/Fall 2020/csc110/assignments/CSC110_Project/Datasets/Samples
-    """
-    tweets = json_to_tweets()
-    deniers = [tweet for tweet in tweets if ('climatechangehoax' in tweet.hashtags)]
-    phrases = find_key_phrases(deniers, 80)
-
-    pprint(phrases)
-
-
 def run_example() -> None:
     """ Example of find_key_phrases on the file:  Year/Fall 2020/csc110/assignments/CSC110_Project/Datasets/Samples
     """
@@ -326,12 +414,29 @@ def run_example() -> None:
     pprint(find_key_hashtags(tweets, 10))
 
     print()
-    print('Phrase in Tweet?')
-    print(tweets[0].text)
+    print('Data Points:')
+    data = data_points_key_phrase(tweets, ('climate', 'change'))
+    pprint(data)
+
     print()
-    print(key_phrases_tuples[0])
-    print_thing = phrase_occurences_in_tweet(tweets[0], key_phrases_tuples[0])
-    print(print_thing)
+    print(sum(data[2]))
+
+    print()
+    print('Key Phrases to Data Points:')
+    keyphrases_to_data = key_phrases_to_data_points(tweets, 5)
+    pprint(keyphrases_to_data)
+
+    print()
+    print('Key Hashtags')
+    hashtags = sorted_hashtag_freq(tweets)
+    pprint(hashtags)
+    print('Number')
+    print(len([tweet for tweet in tweets if (hashtags[4][1] in tweet.hashtags)]))
+
+    print()
+    print('Key Hashtags to Data Points')
+    hashtags_to_data = hashtags_to_data_points(tweets, 5)
+    pprint(hashtags_to_data)
 
 
 if __name__ == '__main__':
