@@ -18,15 +18,47 @@ PUNCTUATION = ['.', ',', '!', '?', ';', ':', "'", '‘', '’', '“', '``', "''
 OTHER = ['@', 'https', "'s", 'u', '...', '..', '%', '$', '—', '–', '\u2066', "'ve", "'re", "'m",
          "n't", 'the…']
 
-states = ['AK', 'AL', 'AR', 'AS', 'AZ', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'GU', 'HI', 'IA',
-          'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN', 'MO', 'MP', 'MS', 'MT',
-          'NA', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'PR', 'RI',
-          'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VI', 'VT', 'WA', 'WI', 'WV', 'WY']
+
+def lists_of_dates_states_occurrences(tweets: List[Tweet], search_phrase) -> Tuple[List[str], List[str], List[int]]:
+    """Return a list of lists where each corresponding index
+
+        - First list (element 0): list of the dates
+        - Second list (element 1): list of the states
+        - Third list (element 2): list of the # of occurrences
+    """
+    d_s_to_occs = date_state_to_occurrences(tweets, search_phrase)
+    sorted_keys = sorted(list(d_s_to_occs.keys()))
+
+    list_of_states = []
+    list_of_dates = []
+    list_of_occurrences = []
+
+    for key in sorted_keys:
+        list_of_states.append(key[0])
+        list_of_dates.append(key[1])
+        list_of_occurrences.append(d_s_to_occs[key])
+
+    return (list_of_dates, list_of_states, list_of_occurrences)
 
 
-def find_occurrences_in_tweets(tweets: List[Tweet], search_phrase: ) ->
+def date_state_to_occurrences(tweets: List[Tweet], search_phrase: tuple) -> Dict[Tuple[str, str], int]:
+    """Return a dictionary where the keys are a tuples of dates and states (dates are strings), and the
+    corresponding values are the number of times the search_phrase occurs in every tweet that was tweeted
+    on that date and in that state
+    """
+    d_s_to_occs_so_far = {}
 
-def is_phrase_in_tweet(tweet: Tweet, search_phrase: tuple) -> bool:
+    for tweet in tweets:
+        date_state = (tweet.date, tweet.state)
+        if date_state in d_s_to_occs_so_far:
+            d_s_to_occs_so_far[date_state] += phrase_occurences_in_tweet(tweet, search_phrase)
+        elif date_state not in d_s_to_occs_so_far:
+            d_s_to_occs_so_far[date_state] = phrase_occurences_in_tweet(tweet, search_phrase)
+
+    return d_s_to_occs_so_far
+
+
+def phrase_occurences_in_tweet(tweet: Tweet, search_phrase: tuple) -> int:
     """Return whether phrase is in the text
 
     Phrases includes:
@@ -39,6 +71,7 @@ def is_phrase_in_tweet(tweet: Tweet, search_phrase: tuple) -> bool:
     sentences_list = nltk.sent_tokenize(tweet.text.lower())
 
     word_list = []
+    occurences = 0
 
     unwanted_words = stopwords.words('english')
     unwanted_words.extend(PUNCTUATION)
@@ -65,7 +98,11 @@ def is_phrase_in_tweet(tweet: Tweet, search_phrase: tuple) -> bool:
     phrases = []
     phrases.extend(tuple_word_list + bigrams + trigrams)
 
-    return search_phrase in phrases
+    for phrase in phrases:
+        if phrase == search_phrase:
+            occurences += 1
+
+    return occurences
 
 
 # ==================================================================================================
@@ -95,7 +132,7 @@ def sorted_hashtag_freq(tweets: List[Tweet]) -> List[Tuple[int, str]]:
 
     hashtags = get_all_hashtags(tweets)
 
-    freqs_dict = word_to_count(hashtags)
+    freqs_dict = keys_to_freq(hashtags)
 
     return sorted(dict_to_tuple_list(freqs_dict), reverse=True)
 
@@ -187,18 +224,19 @@ def get_nouns(words: List[str]) -> List[str]:
     return [tagged_word[0] for tagged_word in tagged_words if tagged_word[1] == 'NN' or tagged_word[1] == 'NNS']
 
 
-def word_to_count(words: List[str]) -> Dict[str, int]:
-    """Add the number of time each word in word appears to phrase counts"""
+def keys_to_freq(keys: List[Any]) -> Dict[Any, int]:
+    """Return a dictionary where the keys are all the unique values in keys, the values and the frequencies of
+    each key in keys the number of time each key in keys appears to phrase counts"""
 
-    word_count_so_far = {}
+    key_freqs_so_far = {}
 
-    for word in words:
-        if word in word_count_so_far:
-            word_count_so_far[word] += 1
-        elif word not in word_count_so_far:
-            word_count_so_far[word] = 1
+    for key in keys:
+        if key in key_freqs_so_far:
+            key_freqs_so_far[key] += 1
+        elif key not in key_freqs_so_far:
+            key_freqs_so_far[key] = 1
 
-    return word_count_so_far
+    return key_freqs_so_far
 
 
 def get_n_grams(finder: collocations.AbstractCollocationFinder) -> List[Tuple[tuple, int]]:
@@ -230,7 +268,7 @@ def get_relative_frequencies(words: List[str]) -> List[Tuple[float, tuple]]:
     trigram_finder = collocations.TrigramCollocationFinder.from_words(words)
 
     # Get the frequencies of all the unigrams (only the nouns) and add it to scored_phrases_so_far
-    unigram_freq_dict = word_to_count(get_nouns(words))
+    unigram_freq_dict = keys_to_freq(get_nouns(words))
     unigram_freq_dict = {tuple([unigram]): unigram_freq_dict[unigram] for unigram in unigram_freq_dict}
     scored_phrases_so_far.extend(dict_to_tuple_list(unigram_freq_dict))
 
@@ -265,7 +303,7 @@ def run_example_find_deniers() -> None:
     """ Example of find_key_phrases on the file:  Year/Fall 2020/csc110/assignments/CSC110_Project/Datasets/Samples
     """
     tweets = json_to_tweets()
-    deniers = [tweet for tweet in tweets if ('#climatechangehoax' in tweet.hashtags)]
+    deniers = [tweet for tweet in tweets if ('climatechangehoax' in tweet.hashtags)]
     phrases = find_key_phrases(deniers, 80)
 
     pprint(phrases)
@@ -292,7 +330,7 @@ def run_example() -> None:
     print(tweets[0].text)
     print()
     print(key_phrases_tuples[0])
-    print_thing = is_phrase_in_tweet(tweets[0], key_phrases_tuples[0])
+    print_thing = phrase_occurences_in_tweet(tweets[0], key_phrases_tuples[0])
     print(print_thing)
 
 

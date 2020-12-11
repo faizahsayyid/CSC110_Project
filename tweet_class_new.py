@@ -37,9 +37,9 @@ class Tweet:
     text: str
     hashtags: Set[str]
     state: str
-    date: datetime.date
+    date: str
 
-    def __init__(self, text: str, hashtags: Set[str], state: str, date: datetime.date):
+    def __init__(self, text: str, hashtags: Set[str], state: str, date: str):
         self.text = text
         self.hashtags = hashtags
         self.state = state
