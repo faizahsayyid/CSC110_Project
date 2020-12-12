@@ -26,8 +26,9 @@ from rehydrate_and_filter_tweets import json_to_tweets
 tweets = json_to_tweets()
 data = sk.key_phrases_to_data_points(tweets, 10)
 keys = list(data.keys())
-
 animations = {}
+
+
 for value in keys:
     animations[value] = px.choropleth(locations=data[value][1],
                                       color=data[value][2],
@@ -39,8 +40,8 @@ for value in keys:
                                       height=600
                                       )
 
-app = dash.Dash(__name__)
 
+app = dash.Dash(__name__)
 app.layout = html.Div([
     html.P("Select a keyword:"),
     dcc.Dropdown(
@@ -61,10 +62,12 @@ def update_graph(input_data):
     if input_data == None:
         px.choropleth(color_continuous_scale="Inferno",
                       locationmode='USA-states',
+                      title="Empty",
                       scope="usa",
                       height=600)
     else:
         return animations[input_data]
 
 
-app.run_server(debug=True)
+if __name__ == '__main__':
+    app.run_server(host='127.0.0.1', port=5000, debug=True)

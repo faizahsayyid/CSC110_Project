@@ -42,6 +42,7 @@ for value in keys:
         animations[value] = px.choropleth(color_continuous_scale="Inferno",
                                           locationmode='USA-states',
                                           scope="usa",
+                                          title="Empty",
                                           height=600
                                           )
 
@@ -67,10 +68,12 @@ def update_graph(input_data):
     if input_data == None:
         px.choropleth(color_continuous_scale="Inferno",
                       locationmode='USA-states',
+                      title="Empty",
                       scope="usa",
                       height=600)
     else:
         return animations[input_data]
 
 
-app.run_server(debug=True)
+if __name__ == '__main__':
+    app.run_server(host='127.0.0.1', port=5050, debug=True)
