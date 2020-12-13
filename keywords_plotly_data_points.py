@@ -33,11 +33,6 @@ PUNCTUATION = ['.', ',', '!', '?', ';', ':', "'", '‘', '’', '“', '``', "''
 OTHER = ['@', 'https', "'s", 'u', '...', '..', '%', '$', '—', '–', '\u2066', "'ve", "'re", "'m",
          "n't", 'the…']
 
-STATES = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA',
-          'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
-          'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT',
-          'VA', 'WA', 'WV', 'WI', 'WY']
-
 
 # ==================================================================================================
 # Functions for getting the data points for our plotly graph (for hashtags)
@@ -488,7 +483,7 @@ if __name__ == '__main__':
 
     import python_ta
     python_ta.check_all(config={
-        'extra-imports': ['nltk', 'tweet_class_new', 'typing', 'rehydrate_and_filter_tweets',
+        'extra-imports': ['nltk', 'tweet_class', 'typing', 'rehydrate_and_filter_tweets',
                           'pprint', 'nltk.corpus'],
         'allowed-io': ['run_example'],
         'max-line-length': 100,

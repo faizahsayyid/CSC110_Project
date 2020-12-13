@@ -128,21 +128,6 @@ def test_find_key_hashtags() -> None:
     assert actual == expected
 
 
-def test_date_to_tweet() -> None:
-    """Test date_to_tweet on LIST_OF_TWEETS"""
-
-    result = keywords_plotly_data_points.date_to_tweet(LIST_OF_TWEETS)
-
-    assert result['2018-01-10'][0] == TWEET1
-    assert result['2018-01-10'][1] == TWEET2
-
-    assert result['2017-10-23'][0] == TWEET3
-
-    assert result['2018-08-06'][0] == TWEET4
-
-    assert result['2018-11-27'][0] == TWEET5
-
-
 if __name__ == '__main__':
     import pytest
     pytest.main(['test_keywords_plotly_data_points.py', '-vv'])
@@ -150,7 +135,7 @@ if __name__ == '__main__':
     import python_ta
 
     python_ta.check_all(config={
-        'extra-imports': ['tweet_class_new', 'keywords_plotly_data_points'],
+        'extra-imports': ['tweet_class', 'keywords_plotly_data_points'],
         'allowed-io': [],
         'max-line-length': 100,
         'disable': ['R1705', 'C0200']
