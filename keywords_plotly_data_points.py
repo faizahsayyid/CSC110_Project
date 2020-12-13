@@ -183,6 +183,17 @@ def date_state_to_phrase_occurrences(tweets: List[Tweet], search_phrase: tuple) 
 
     return d_s_to_occs_so_far
 
+    # d_s_to_occs_so_far = {}
+    #
+    # for tweet in tweets:
+    #     date_state = (tweet.date, tweet.state)
+    #     if date_state in d_s_to_occs_so_far:
+    #         d_s_to_occs_so_far[date_state] += phrase_occurrences_in_tweet(tweet, search_phrase)
+    #     elif date_state not in d_s_to_occs_so_far:
+    #         d_s_to_occs_so_far[date_state] = phrase_occurrences_in_tweet(tweet, search_phrase)
+    #
+    # return d_s_to_occs_so_far
+
 
 # ==================================================================================================
 # Helper functions for making the plotly animation data points
@@ -243,7 +254,7 @@ def phrase_occurrences_in_tweet(tweet: Tweet, search_phrase: tuple) -> int:
     - bi-grams (aka two words that are commonly used together)
     - tri-grams (aka three words that are commonly used together)
 
-    >>> t = Tweet(text='What is life. Life is meaningless. Meaningless is life.', hashtags=set(), \
+    >>> t = Tweet(text='what is life. life is meaningless. meaningless is life.', hashtags=set(), \
       state='ME', date='2018-02-12')
     >>> phrase_occurrences_in_tweet(t, ('life',))
     3
@@ -291,7 +302,7 @@ def get_all_hashtags(tweets: List[Tweet]) -> List[str]:
     hashtags_so_far = []
 
     for tweet in tweets:
-        hashtags_so_far.extend([hashtag.lower() for hashtag in tweet.hashtags])
+        hashtags_so_far.extend(tweet.hashtags)
 
     return hashtags_so_far
 
@@ -366,7 +377,7 @@ def tweet_to_words(tweet: Tweet) -> List[str]:
     Excludes words such as 'and', 'the', 'as', 'he', 'her', etc (provided by nltk.corpus.stopwords)
     in returned list. Also does not include punctuation.
 
-    >>> t = Tweet(text='What is life. Life is meaningless. Meaningless is life.', hashtags=set(), \
+    >>> t = Tweet(text='what is life. life is meaningless. meaningless is life.', hashtags=set(), \
       state='ME', date='2018-02-12')
     >>> tweet_to_words(t)
     ['life', 'life', 'meaningless', 'meaningless', 'life']
@@ -379,7 +390,7 @@ def tweet_to_words(tweet: Tweet) -> List[str]:
     unwanted_words.extend(PUNCTUATION + OTHER)
 
     # Break up tweet into sentences
-    sentences_list = nltk.sent_tokenize(tweet.text.lower())
+    sentences_list = nltk.sent_tokenize(tweet.text)
 
     # Break up sentences into words
     for sent in sentences_list:
