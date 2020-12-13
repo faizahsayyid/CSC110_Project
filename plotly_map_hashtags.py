@@ -32,7 +32,7 @@ for value in keys:
     if data[value][0] != [] or data[value][1] != [] or data[value][2] != []:
         animations[value] = px.choropleth(locations=data[value][1],
                                           color=data[value][2],
-                                          animation_frame=[str(date) for date in data[value][0]],
+                                          animation_frame=data[value][0],
                                           color_continuous_scale="Inferno",
                                           locationmode='USA-states',
                                           scope="usa",
