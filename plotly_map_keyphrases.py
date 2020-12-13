@@ -19,7 +19,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.express as px
-import search_for_keywords as sk
+import keywords_plotly_data_points as sk
 from rehydrate_and_filter_tweets import json_to_tweets
 
 
