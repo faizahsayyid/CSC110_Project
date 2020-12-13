@@ -28,20 +28,27 @@ data = sk.key_phrases_to_data_points(tweets, 10)
 keys = list(data.keys())
 animations = {}
 
-
 for value in keys:
-    animations[value] = px.choropleth(locations=data[value][1],
-                                      color=data[value][2],
-                                      animation_frame=[str(date) for date in data[value][0]],
-                                      color_continuous_scale="Inferno",
-                                      locationmode='USA-states',
-                                      scope="usa",
-                                      range_color=(0, max(data[value][2])),
-                                      height=600
-                                      )
-
+    if data[value][0] != [] and data[value][1] != [] and data[value][2] != []:
+        animations[value] = px.choropleth(locations=data[value][1],
+                                          color=data[value][2],
+                                          animation_frame=[str(date) for date in data[value][0]],
+                                          color_continuous_scale="Inferno",
+                                          locationmode='USA-states',
+                                          scope="usa",
+                                          range_color=(0, max(data[value][2])),
+                                          height=600
+                                          )
+    else:
+        animations[value] = px.choropleth(color_continuous_scale="Inferno",
+                                          locationmode='USA-states',
+                                          scope="usa",
+                                          title="Empty",
+                                          height=600
+                                          )
 
 app = dash.Dash(__name__)
+
 app.layout = html.Div([
     html.P("Select a keyword:"),
     dcc.Dropdown(
