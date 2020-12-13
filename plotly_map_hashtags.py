@@ -29,7 +29,7 @@ keys = list(data.keys())
 
 animations = {}
 for value in keys:
-    if data[value][0] != [] and data[value][1] != [] and data[value][2] != []:
+    if data[value][0] != [] or data[value][1] != [] or data[value][2] != []:
         animations[value] = px.choropleth(locations=data[value][1],
                                           color=data[value][2],
                                           animation_frame=[str(date) for date in data[value][0]],
