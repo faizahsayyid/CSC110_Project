@@ -1,4 +1,4 @@
-"""CSC110 Project: Search For Keywords
+"""CSC110 Project: Search For Keywords and Generating Data for Plotly
 
 Module Description
 ==================
@@ -28,7 +28,7 @@ PUNCTUATION = ['.', ',', '!', '?', ';', ':', "'", '‘', '’', '“', '``', "''
 OTHER = ['@', 'https', "'s", 'u', '...', '..', '%', '$', '—', '–', '\u2066', "'ve", "'re", "'m",
          "n't", 'the…']
 
-STATES = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS',
+STATES = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS',
           'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC',
           'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY']
 
@@ -42,7 +42,6 @@ def hashtags_to_data_points(tweets: List[Tweet], num_key_hashtags: int) -> \
     """Return a dictionary where the keys are the key hashtags from the tweets and the values are
     the data points corresponding to that hashtag.
     """
-
     key_hashtags = find_key_hashtags(tweets, num_key_hashtags)
 
     data_points_dict_so_far = {}
@@ -74,6 +73,9 @@ def date_state_to_hashtag_pop(tweets: List[Tweet], hashtag: str) -> Dict[Tuple[s
     and the corresponding values is the popularity of the given hashtag in that state at that time
     """
     date_to_t = date_to_tweet(tweets)
+
+    # ACCUMULATOR d_s_to_occs_so_far dictionary of {(state, date): popularity}
+    # initial value: all the combinations of dates and states to zero
     d_s_to_hashtag_pop = {(date, state): 0 for date in date_to_t for state in STATES}
 
     for date in date_to_t:
@@ -99,6 +101,8 @@ def key_phrases_to_data_points(tweets: List[Tweet], num_key_phrases: int) -> \
     """Return a dictionary where the keys are the key phrases from the tweets and the values are
     the data points corresponding to that key phrase.
     """
+    # ACCUMULATOR data_points_dict_so_far builds the dict of hashtags to the corresponding
+    # data points
     data_points_dict_so_far = {}
 
     key_phrases = find_key_phrases(tweets, num_key_phrases)
@@ -134,6 +138,8 @@ def date_state_to_phrase_occurrences(tweets: List[Tweet], search_phrase: tuple) 
 
     date_to_t = date_to_tweet(tweets)
 
+    # ACCUMULATOR d_s_to_occs_so_far dictionary of {(state, date): occurrences}
+    # initial value: all the combinations of dates and states to zero
     d_s_to_occs_so_far = {(date, state): 0 for date in date_to_t for state in STATES}
 
     for date in date_to_t:
@@ -143,20 +149,20 @@ def date_state_to_phrase_occurrences(tweets: List[Tweet], search_phrase: tuple) 
 
             for tweet in date_to_t[date]:
                 if date_state in d_s_to_occs_so_far and (tweet.state == state):
-                    d_s_to_occs_so_far[date_state] += phrase_occurences_in_tweet(tweet, search_phrase)
+                    d_s_to_occs_so_far[date_state] += phrase_occurrences_in_tweet(tweet, search_phrase)
 
     return d_s_to_occs_so_far
 
 
 # ==================================================================================================
-# Helper function for converting a Dict[Tuple[str, str], int] from date_state_to_phrase_occurrences
-# and date_state_to_hashtag_pop into data points for plotly
+# Helper functions for making the plotly animation data points
 # ==================================================================================================
 
 def date_to_tweet(tweets: List[Tweet]) -> Dict[str, List[Tweet]]:
     """Return a dictionary where the keys are all the dates that a tweet occurred within the
     given list of tweets, and the values are the tweets that occured on that day"""
 
+    # ACCUMULATOR d_to_t_so_far builds a dictionary from dates to list of tweets
     d_to_t_so_far = {}
 
     for tweet in tweets:
@@ -171,11 +177,20 @@ def date_to_tweet(tweets: List[Tweet]) -> Dict[str, List[Tweet]]:
 def data_points(data_dict: Dict[Tuple[str, str], int]) -> Tuple[List[str], List[str], List[int]]:
     """Return a tuple of lists for the given data that corresponds to format plotly needs for a
     map graph animation
+
+    >>> d = {('a', 'dogs'): 1, ('b', 'cats'): 3, ('c', 'bunnies'): 4}
+    >>> data_points(d)
+    (['a', 'b', 'c'], ['dogs', 'cats', 'bunnies'], [1, 3, 4])
     """
     sorted_keys = sorted(list(data_dict.keys()))
 
+    # ACCUMULATOR listed_data_1 keeps track of the first element of every key
     listed_data_1 = []
+
+    # ACCUMULATOR listed_data_2 keeps track of the second element of every key
     listed_data_2 = []
+
+    # ACCUMULATOR listed_data_3 keeps track of the corresponding values of every key
     listed_data_3 = []
 
     for key in sorted_keys:
@@ -190,36 +205,27 @@ def data_points(data_dict: Dict[Tuple[str, str], int]) -> Tuple[List[str], List[
 # Function for finding the number of times a a phrase occurs in a tweet
 # ==================================================================================================
 
-def phrase_occurences_in_tweet(tweet: Tweet, search_phrase: tuple) -> int:
+def phrase_occurrences_in_tweet(tweet: Tweet, search_phrase: tuple) -> int:
     """Return number of times a a phrase occurs in a tweet
 
     Phrases includes:
     - uni-grams - single words
     - bi-grams (aka two words that are commonly used together)
     - tri-grams (aka three words that are commonly used together)
-    - quad-grams (aka four words that are commonly used together)
+
+    >>> t = Tweet(text='What is life. Life is meaningless. Meaningless is life.', hashtags=set(), \
+      state='ME', date='2018-02-12')
+    >>> phrase_occurrences_in_tweet(t, ('life',))
+    3
+    >>> phrase_occurrences_in_tweet(t, ('life', 'meaningless'))
+    1
     """
 
-    sentences_list = nltk.sent_tokenize(tweet.text.lower())
+    # ACCUMULATOR occurrences_so_far keeps track of the # of times search_phrase occurs
+    # in the tweet
+    occurrences_so_far = 0
 
-    word_list = []
-    occurences = 0
-
-    unwanted_words = stopwords.words('english')
-    unwanted_words.extend(PUNCTUATION)
-    unwanted_words.extend(OTHER)
-
-    for sent in sentences_list:
-        word_list.extend(nltk.word_tokenize(sent))
-
-    # Remove unwanted words
-    copy_of_words = word_list.copy()
-
-    for word in copy_of_words:
-        if word in unwanted_words:
-            word_list.remove(word)
-        elif '//t.co/' in word or '@' in word or any(c.isdigit() for c in word):
-            word_list.remove(word)
+    word_list = tweet_to_words(tweet)
 
     bigrams = list(nltk.bigrams(word_list))
 
@@ -227,14 +233,13 @@ def phrase_occurences_in_tweet(tweet: Tweet, search_phrase: tuple) -> int:
 
     tuple_word_list = [tuple([word]) for word in word_list]
 
-    phrases = []
-    phrases.extend(tuple_word_list + bigrams + trigrams)
+    phrases = tuple_word_list + bigrams + trigrams
 
     for phrase in phrases:
         if phrase == search_phrase:
-            occurences += 1
+            occurrences_so_far += 1
 
-    return occurences
+    return occurrences_so_far
 
 
 # ==================================================================================================
@@ -251,6 +256,8 @@ def find_key_hashtags(tweets: List[Tweet], num_key_hashtags: int) -> List[str]:
 
 def get_all_hashtags(tweets: List[Tweet]) -> List[str]:
     """Return a list of all the hashtags fro the given list of tweets"""
+
+    # ACCUMULATOR hashtags_so_far keeps track of all the hashtags in tweets
     hashtags_so_far = []
 
     for tweet in tweets:
@@ -270,12 +277,28 @@ def sorted_hashtag_freq(tweets: List[Tweet]) -> List[Tuple[int, str]]:
 
 
 # ==================================================================================================
+# Function for finding key phrases from a list of tweets
+# ==================================================================================================
+
+def find_key_phrases(tweets: List[Tweet], num_key_phrases: int) -> List[tuple]:
+    """Return a list of key phrases from the given list of tweets with length num_key_phrases
+
+    Precondition:
+        - num_key_phrases <= len(phrases_to_occurrences(tweets)) # the # of phrases in the tweets
+    """
+    phrase_freqs = sorted(tweet_phrase_freq(tweets), reverse=True)
+
+    key_phrases = phrase_freqs[:num_key_phrases]
+
+    return [p[1] for p in key_phrases]
+
+
+# ==================================================================================================
 # Function for finding phrases in tweets and how often they occur
 # ==================================================================================================
 
-def tweet_phrase_freq(tweets: List[Tweet]) -> List[Tuple[float, tuple]]:
-    """ Return a corpus including all the relevant phrases from the text of a list of tweets.
-    Each of the phrases will be scored based on there frequency in the list of tweets.
+def tweet_phrase_freq(tweets: List[Tweet]) -> List[Tuple[int, tuple]]:
+    """ Return list of frequency and phrase pairs for all the text in the given tweets
 
      Phrases includes:
         - uni-grams - single words
@@ -289,29 +312,11 @@ def tweet_phrase_freq(tweets: List[Tweet]) -> List[Tuple[float, tuple]]:
 
 
 # ==================================================================================================
-# Function for finding key phrases from a list of tweets
-# ==================================================================================================
-
-
-def find_key_phrases(tweets: List[Tweet], num_keyphrases: int) -> List[tuple]:
-    """Return a list of key phrases from the given list of tweets with length num_keyphrases
-
-    Precondition:
-        - num_keyphrases <= len(phrases_to_occurrences(tweets)) # the # of phrases in the tweets
-    """
-    phrase_freqs = sorted(tweet_phrase_freq(tweets), reverse=True)
-
-    keyphrases = phrase_freqs[:num_keyphrases]
-
-    return [p[1] for p in keyphrases]
-
-
-# ==================================================================================================
 # Helper Functions for tweet_phrase_freq
 # ==================================================================================================
 
 def tweets_to_words(tweets: List[Tweet]) -> List[str]:
-    """Return a words in the text of a tweets where each word is separated into a list of string
+    """Return a words in the text of tweets where each word is separated into a list of string
 
     Excludes words such as 'and', 'the', 'as', 'he', 'her', etc (provided by nltk.corpus.stopwords)
     in returned list. Also does not include punctuation.
@@ -319,20 +324,35 @@ def tweets_to_words(tweets: List[Tweet]) -> List[str]:
     # ACCUMULATOR words_so_far keeps track of the words in the tweet
     words_so_far = []
 
+    for tweet in tweets:
+        words_so_far.extend(tweet_to_words(tweet))
+
+    return words_so_far
+
+
+def tweet_to_words(tweet: Tweet) -> List[str]:
+    """Return a words in the text of a tweet where each word is separated into a list of string
+
+    Excludes words such as 'and', 'the', 'as', 'he', 'her', etc (provided by nltk.corpus.stopwords)
+    in returned list. Also does not include punctuation.
+
+    >>> t = Tweet(text='What is life. Life is meaningless. Meaningless is life.', hashtags=set(), \
+      state='ME', date='2018-02-12')
+    >>> tweet_to_words(t)
+    ['life', 'life', 'meaningless', 'meaningless', 'life']
+    """
+    # ACCUMULATOR words_so_far keeps track of the words in the tweet
+    words_so_far = []
+
     # List of words to not include in our final returned list
     unwanted_words = stopwords.words('english')
-    unwanted_words.extend(PUNCTUATION)
-    unwanted_words.extend(OTHER)
+    unwanted_words.extend(PUNCTUATION + OTHER)
 
-    sentences_so_far = []
-
-    for tweet in tweets:
-        # Break up tweet into sentences
-        sentences_list = nltk.sent_tokenize(tweet.text.lower())
-        sentences_so_far.extend(sentences_list)
+    # Break up tweet into sentences
+    sentences_list = nltk.sent_tokenize(tweet.text.lower())
 
     # Break up sentences into words
-    for sent in sentences_so_far:
+    for sent in sentences_list:
         words = nltk.word_tokenize(sent)
         for word in words:
             words_so_far.append(word)
@@ -350,18 +370,27 @@ def tweets_to_words(tweets: List[Tweet]) -> List[str]:
 
 
 def get_nouns(words: List[str]) -> List[str]:
-    """Return a list of all the nouns from the given words"""
+    """Return a list of all the nouns from the given words
+
+    >>> get_nouns(['say', 'climate', 'oil', 'fire', 'when', 'what'])
+    ['climate', 'oil', 'fire']
+    """
     tagged_words = nltk.pos_tag(words)
 
     return [tagged_word[0] for tagged_word in tagged_words
-            if tagged_word[1] == 'NN' or tagged_word[1] == 'NNS']
+            if (tagged_word[1] == 'NN') or (tagged_word[1] == 'NNS')]
 
 
 def keys_to_freq(keys: List[Any]) -> Dict[Any, int]:
     """Return a dictionary where the keys are all the unique values in keys, the values and the
     frequencies of each key in keys the number of time each key in keys appears to phrase counts
+
+    >>> result = keys_to_freq(['a', 'b', 'c', 'a', 'a', 'b', 'a'])
+    >>> result == {'a': 4, 'b': 2, 'c': 1}
+    True
     """
 
+    # ACCUMULATOR key_freqs_so_far builds the dictionary from key to frequency
     key_freqs_so_far = {}
 
     for key in keys:
@@ -374,7 +403,12 @@ def keys_to_freq(keys: List[Any]) -> Dict[Any, int]:
 
 
 def get_n_grams(finder: collocations.AbstractCollocationFinder) -> List[Tuple[tuple, int]]:
-    """Return all the bigrams from the words"""
+    """Return all the bigrams from the given finder, scored by frequency
+
+    >>> my_finder = collocations.BigramCollocationFinder.from_words(['what', 'is', 'life'])
+    >>> get_n_grams(my_finder)
+    [(1, ('what', 'is')), (1, ('is', 'life'))]
+    """
 
     scored_n_grams = list(finder.ngram_fd.items())
 
@@ -383,7 +417,7 @@ def get_n_grams(finder: collocations.AbstractCollocationFinder) -> List[Tuple[tu
     return inverted_scored_ngrams
 
 
-def get_relative_frequencies(words: List[str]) -> List[Tuple[float, tuple]]:
+def get_relative_frequencies(words: List[str]) -> List[Tuple[int, tuple]]:
     """ Return a list of the relative frequencies and phrases from words
 
     Relative frequencies are the amount of time each phrase appears in words divided by len(words)
@@ -392,7 +426,13 @@ def get_relative_frequencies(words: List[str]) -> List[Tuple[float, tuple]]:
     - uni-grams - single words
     - bi-grams (aka two words that are commonly used together)
     - tri-grams (aka three words that are commonly used together)
-    - quad-grams (aka four words that are commonly used together)
+
+    >>> result = get_relative_frequencies(['what', 'is', 'life', 'life', 'is', 'meaningless'])
+    >>> expected = [(2, ('life',)), (1, ('what', 'is')), (1, ('is', 'life')), (1, ('life', 'life')),\
+     (1, ('life', 'is')), (1, ('is', 'meaningless')), (1, ('what', 'is', 'life')), \
+     (1, ('is', 'life', 'life')), (1, ('life', 'life', 'is')), (1, ('life', 'is', 'meaningless'))]
+    >>> result == expected
+    True
     """
     # ACCUMULATOR phrase_count_so_far build dictionary from phrases to occurrences
     scored_phrases_so_far = []
@@ -403,8 +443,10 @@ def get_relative_frequencies(words: List[str]) -> List[Tuple[float, tuple]]:
 
     # Get the frequencies of all the unigrams (only the nouns) and add it to scored_phrases_so_far
     unigram_freq_dict = keys_to_freq(get_nouns(words))
+
     unigram_freq_dict = {tuple([unigram]): unigram_freq_dict[unigram]
                          for unigram in unigram_freq_dict}
+
     scored_phrases_so_far.extend(dict_to_tuple_list(unigram_freq_dict))
 
     # Get the frequencies of all the bigrams and trigrams, and add them to scored_phrases_so_far
@@ -416,7 +458,12 @@ def get_relative_frequencies(words: List[str]) -> List[Tuple[float, tuple]]:
 
 def dict_to_tuple_list(d: Dict[Any, int]) -> List[Tuple[int, Any]]:
     """Return a list of tuples sorted based on the value of each key value pair in d
-     """
+
+    >>> result = dict_to_tuple_list({'a': 1, 'b': 2, 'c': 3})
+    >>> set(result) == {(1, 'a'), (2, 'b'), (3, 'c')}
+    True
+    """
+    # ACCUMULATOR tuple_list_so_far keep track of all the int and value pair
     tuple_list_so_far = []
 
     for key in d:
@@ -426,7 +473,11 @@ def dict_to_tuple_list(d: Dict[Any, int]) -> List[Tuple[int, Any]]:
 
 
 def list_tuple_to_list_str(list_of_tuple: List[tuple]) -> List[str]:
-    """ Return a list of strings given a list of tuples"""
+    """ Return a list of strings given a list of tuples
+
+    >>> list_tuple_to_list_str([('climate', 'change'), ('What', 'is', 'life')])
+    ['climate change', 'What is life']
+    """
     return [' '.join(t) for t in list_of_tuple]
 
 
@@ -452,7 +503,7 @@ def run_example() -> None:
     pprint(find_key_hashtags(tweets, 10))
 
     print()
-    print('Data Points:')
+    print('Data Points (key phrase  - "climate change"):')
     data = data_points_key_phrase(tweets, ('climate', 'change'))
     pprint(data)
 
@@ -461,15 +512,8 @@ def run_example() -> None:
 
     print()
     print('Key Phrases to Data Points:')
-    keyphrases_to_data = key_phrases_to_data_points(tweets, 5)
-    pprint(keyphrases_to_data)
-
-    print()
-    print('Key Hashtags')
-    hashtags = sorted_hashtag_freq(tweets)
-    pprint(hashtags)
-    print('Number')
-    print(len([tweet for tweet in tweets if (hashtags[4][1] in tweet.hashtags)]))
+    key_phrases_to_data = key_phrases_to_data_points(tweets, 5)
+    pprint(key_phrases_to_data)
 
     print()
     print('Key Hashtags to Data Points')
@@ -479,3 +523,6 @@ def run_example() -> None:
 
 if __name__ == '__main__':
     run_example()
+
+    import doctest
+    doctest.testmod()
