@@ -2,8 +2,41 @@
 
 Module Description
 ==================
-This module contains the functions for finding all keywords in a list of tweets, and sorting them
-based on the number of time they occur.
+The module keywords_plotly_data_points:
+    - Finds the keywords/phrases and key hashtags within in a lists of tweets (using the nltk
+    library)
+    - The number of times these keywords/phrases and key hashtags occur in each state on
+    a particular date
+    - Organizes the above data into data points formatted for plotly
+
+Find keywords/phrases and key hashtags:
+
+The first step to finding keywords was to separated the tweet text in to a list of words, removing
+words that are obviously not keywords, such as 'the' 'and', 'is', etc, as well as punctuation. This
+was done in our function tweets_to_word using nltk.word_tokenize, nltk.sent_tokenize, nltk.corpus.stopwords,
+as well as the hard coded constants PUNCTUATION, and OTHER. Next, in our function get_relative_frequencies,
+key phrases/collocations were founds using nltk.collocations.BigramCollocationFinder and
+nltk.collocations.TrigramCollocationFinder. Bi-grams are two word combinations, while trigrams are three word
+combinations. Finally all of single words (excluding words that aren't nouns using nltk.pos_tag), bi-grams, and
+trigrams are ranked by frequency to find the keywords (with in the same function). All of this was put together
+in the function find_key_phrases.
+
+A similar approach was taken for find_key_hashtags. The first two steps, turning text into a list of words,
+and finding the bi-grams and trigrams were skipped. Instead we simply gathered all the hashtags and found their
+frequencies.
+
+Date, State to Keyword Occurrences & Plotly Data Points:
+
+Having found the keywords and key hashtags, we then found their prevalence in each state on particular dates.
+To do this we found all the dates that tweets were tweeted from our data (in our function date_to_tweet), and used
+the hard coded constant STATES to get all the combinations of dates and states. Then, we iterated through each
+combination to find the prevalence of a given keyword in date_state_to_phrase_occurrences and
+date_state_to_hashtag_pop. This gave us a dictionary in the form {(date, state), occurrences}.
+
+From there, we converted the data from this format to one supported by plotly, which is three lists, one for each of
+dates, states, and occurrences where for index i (list1[i], list2[i], list3[i]) corresponds to a single data point.
+This was done in our function data_points.
+
 
 Copyright and Usage Information
 ===============================
@@ -78,16 +111,14 @@ def date_state_to_hashtag_pop(tweets: List[Tweet], hashtag: str) -> Dict[Tuple[s
     # initial value: all the combinations of dates and states to zero
     d_s_to_hashtag_pop = {(date, state): 0 for date in date_to_t for state in STATES}
 
-    for date in date_to_t:
+    for date_state in d_s_to_hashtag_pop:
+        date, state = date_state
 
-        for state in STATES:
-            date_state = (date, state)
+        for tweet in date_to_t[date]:
 
-            for tweet in date_to_t[date]:
-
-                if hashtag in tweet.hashtags and (tweet.state == state):
-                    if date_state in d_s_to_hashtag_pop:
-                        d_s_to_hashtag_pop[date_state] += 1
+            if hashtag in tweet.hashtags and (tweet.state == state):
+                if date_state in d_s_to_hashtag_pop:
+                    d_s_to_hashtag_pop[date_state] += 1
 
     return d_s_to_hashtag_pop
 
@@ -142,14 +173,13 @@ def date_state_to_phrase_occurrences(tweets: List[Tweet], search_phrase: tuple) 
     # initial value: all the combinations of dates and states to zero
     d_s_to_occs_so_far = {(date, state): 0 for date in date_to_t for state in STATES}
 
-    for date in date_to_t:
+    for date_state in d_s_to_occs_so_far:
 
-        for state in STATES:
-            date_state = (date, state)
+        date, state = date_state
 
-            for tweet in date_to_t[date]:
-                if date_state in d_s_to_occs_so_far and (tweet.state == state):
-                    d_s_to_occs_so_far[date_state] += phrase_occurrences_in_tweet(tweet, search_phrase)
+        for tweet in date_to_t[date]:
+            if date_state in d_s_to_occs_so_far and (tweet.state == state):
+                d_s_to_occs_so_far[date_state] += phrase_occurrences_in_tweet(tweet, search_phrase)
 
     return d_s_to_occs_so_far
 
