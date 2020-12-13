@@ -15,7 +15,7 @@ This file is Copyright (c) 2020 Faizah Sayyid, Tina Zhang, Poorvi Sharma, and Co
 """
 
 import keywords_plotly_data_points
-from tweet_class_new import Tweet
+from tweet_class import Tweet
 
 
 TWEET1 = Tweet(

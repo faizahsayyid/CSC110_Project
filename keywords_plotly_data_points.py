@@ -24,7 +24,7 @@ from pprint import pprint
 import nltk
 from nltk import collocations
 from nltk.corpus import stopwords
-from tweet_class_new import Tweet
+from tweet_class import Tweet
 from rehydrate_and_filter_tweets import json_to_tweets
 
 PUNCTUATION = ['.', ',', '!', '?', ';', ':', "'", '‘', '’', '“', '``', "''", '-', '”', '&', '/',
@@ -78,24 +78,10 @@ def date_state_to_hashtag_pop(tweets: List[Tweet], hashtag: str) -> Dict[Tuple[s
     """Return a dictionary where the keys are a tuples of dates and states (dates are strings),
     and the corresponding values is the popularity of the given hashtag in that state at that time
     """
-    # date_to_t = date_to_tweet(tweets)
 
     # ACCUMULATOR d_s_to_occs_so_far dictionary of {(state, date): popularity}
     d_s_to_hashtag_pop = {}
 
-    # {(date, state): 0 for date in date_to_t for state in STATES}
-
-    # for date_state in d_s_to_hashtag_pop:
-    #     date, state = date_state
-    #
-    #     for tweet in date_to_t[date]:
-    #
-    #         if hashtag in tweet.hashtags and (tweet.state == state):
-    #             if date_state in d_s_to_hashtag_pop:
-    #                 d_s_to_hashtag_pop[date_state] += 1
-
-    # d_s_to_occs_so_far = {}
-    #
     for tweet in tweets:
         date_state = (tweet.date, tweet.state)
         if (date_state in d_s_to_hashtag_pop) and (hashtag in tweet.hashtags):
@@ -166,22 +152,6 @@ def date_state_to_phrase_occurrences(tweets: List[Tweet], search_phrase: tuple) 
 # ==================================================================================================
 # Helper functions for making the plotly animation data points
 # ==================================================================================================
-
-def date_to_tweet(tweets: List[Tweet]) -> Dict[str, List[Tweet]]:
-    """Return a dictionary where the keys are all the dates that a tweet occurred within the
-    given list of tweets, and the values are the tweets that occured on that day"""
-
-    # ACCUMULATOR d_to_t_so_far builds a dictionary from dates to list of tweets
-    d_to_t_so_far = {}
-
-    for tweet in tweets:
-        if tweet.date in d_to_t_so_far:
-            d_to_t_so_far[tweet.date].append(tweet)
-        else:
-            d_to_t_so_far[tweet.date] = [tweet]
-
-    return d_to_t_so_far
-
 
 def data_points(data_dict: Dict[Tuple[str, str], int]) -> Tuple[List[str], List[str], List[int]]:
     """Return a tuple of lists for the given data that corresponds to format plotly needs for a

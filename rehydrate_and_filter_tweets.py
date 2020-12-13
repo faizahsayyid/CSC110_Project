@@ -2,6 +2,24 @@
 CSC110 PROJECT FILTERING_AND_REHYDRATING.PY
 DATE: NOVEMBER 2020
 GROUP: COURTNEY AMM, FAIZAH SAYYID, POORVI SHARMA, TINA ZHANG
+
+
+This module serves as the initial data processing function for the project.
+The main function, filter_tweets, takes a file containing a "dehydrated" tweet
+dataset (meaning that the dataset contains only tweet ids, and no other data
+about the tweets), rehydrates those tweets, and then processes them to be our own
+tweet datatypes. This is then written to a json lines file for future use. This process
+also uses two helper functions, get_date and get_location
+
+This module also contains the json_to_tweets function, which serves to process the
+tweets written to the json lines file back in to a list of tweets to be used by our other
+modules. This function uses one helper module, process_json_hashtags
+
+Finally, there are two other functions, json_make_lowercase and shrink_dataset. These were
+created to reprocess some of the dataset to better fit the needs of the other modules. The first
+function makes the text and hashtags of the tweets in the jsonl file lowercase, the second shrinks
+the dataset by a given amount in such a way that the data is still evenly distributed.
+
 """
 import datetime
 import json
@@ -9,19 +27,19 @@ from twarc import Twarc
 import tweet_class
 
 # FILL THESE OUT BEFORE ATTEMPTING TO USE THESE FUNCTIONS
-consumer_key = ''
-consumer_secret = ''
-access_token = ''
-access_token_secret = ''
+CONSUMER_KEY = 'lAWI9LDAMJPFT1HVChPsz2kCo'
+CONSUMER_SECRET = 'CyvpOXFjtdNVMR60WH3YWNewtYq6XPoKw71DhlTix9nrdpPd0h'
+ACCESS_TOKEN = '1322896303597211649-dQ6szuQeIFxpDzKwSZlCeLM6HFvPhq'
+ACCESS_TOKEN_SECRET = 'QPorDdlNYEqvXzN0jrorDrg5XwdUVatDJKmXNDtIp2kax'
 
 # Creating a twarc instance to rehydrate and sort the ids
-t = Twarc(consumer_key,
-          consumer_secret,
-          access_token,
-          access_token_secret,
+T = Twarc(CONSUMER_KEY,
+          CONSUMER_SECRET,
+          ACCESS_TOKEN,
+          ACCESS_TOKEN_SECRET,
           tweet_mode="extended")
 
-states_dict = {'AL': 'AL', 'AK': 'AK', 'AZ': 'AZ', 'AR': 'AR', 'CA': 'CA', 'CO': 'CO', 'CT': 'CT',
+STATES_DICT = {'AL': 'AL', 'AK': 'AK', 'AZ': 'AZ', 'AR': 'AR', 'CA': 'CA', 'CO': 'CO', 'CT': 'CT',
                'DE': 'DE', 'FL': 'FL', 'GA': 'GA', 'HI': 'HI', 'ID': 'ID', 'IL': 'IL', 'IN': 'IN',
                'IA': 'IA', 'KS': 'KS', 'KY': 'KY', 'LA': 'LA', 'ME': 'ME', 'MD': 'MD', 'MA': 'MA',
                'MI': 'MI', 'MN': 'MN', 'MS': 'MS', 'MO': 'MO', 'MT': 'MT', 'NE': 'NE', 'NV': 'NV',
@@ -42,7 +60,7 @@ states_dict = {'AL': 'AL', 'AK': 'AK', 'AZ': 'AZ', 'AR': 'AR', 'CA': 'CA', 'CO':
                'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV',
                'Wisconsin': 'WI', 'Wyoming': 'WY'}
 
-months = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, "Jul": 7, "Aug": 8, "Sep": 9,
+MONTHS = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, "Jul": 7, "Aug": 8, "Sep": 9,
           "Oct": 10, "Nov": 11, "Dec": 12}
 
 
@@ -59,7 +77,7 @@ def get_date(tweetdate: str) -> datetime.date:
 
     """
     date_list = str.split(tweetdate)
-    return datetime.date(int(date_list[-1]), months[date_list[1]], int(date_list[2]))
+    return datetime.date(int(date_list[-1]), MONTHS[date_list[1]], int(date_list[2]))
 
 
 def get_location(location: str) -> str:
@@ -71,9 +89,9 @@ def get_location(location: str) -> str:
     'NY'
 
     """
-    for state in states_dict:
+    for state in STATES_DICT:
         if state in location:
-            return states_dict[state]
+            return STATES_DICT[state]
 
     print("error: Location not found")
     return 'error'
@@ -89,7 +107,7 @@ def filter_tweets(input_file: str, output_file: str) -> None:
 
     # Go through tweet ids line by line and rehydrate the tweet,
     # giving us a twarc tweet object
-    for tweet in t.hydrate(open(input_file)):
+    for tweet in T.hydrate(open(input_file)):
         # Take the location out of the tweet object (based on the user's location)
         temp_location = tweet["user"]["location"]
 
@@ -99,7 +117,7 @@ def filter_tweets(input_file: str, output_file: str) -> None:
 
         # Checks if current tweet is from the US, has a state specified, and is not
         # a retweet. If it matches those criteria, then it is processed
-        if any(state in temp_location for state in states_dict) and retweet != "RT":
+        if any(state in temp_location for state in STATES_DICT) and retweet != "RT":
             # Gets the state postal code for the tweet based on its location
             new_loc = get_location(temp_location)
 
@@ -125,34 +143,13 @@ def filter_tweets(input_file: str, output_file: str) -> None:
     out.close()
 
 
-# This is redundant, will remove before project submission
-def process_json_date(date: str) -> datetime.date:
-    """ Takes a date in from the json file in the format year-month-day (ex. 2018-08-13)
-    and returns the date as a datetime.date object.
-
-    >>> process_json_date("2018-08-13")
-    datetime.date(2018, 8, 13)
-    """
-    # Split string in to a list
-    date_list = str.split(date, '-')
-
-    # Checks for a 0 before the day or month and removes it, for example "08" -> "8"
-    if date_list[1][0] == '0':
-        date_list[1] = date_list[1][1]
-
-    if date_list[2][0] == '0':
-        date_list[2] = date_list[2][1]
-
-    # Returns final date in datetime formatting
-    return datetime.date(int(date_list[0]), int(date_list[1]), int(date_list[2]))
-
-
 def process_json_hashtags(hashstring: str) -> set:
     """ Takes a string of hashtags in the format "{'hash_tag_name', 'hash_tag_name_2'}"
     and returns the hashtags as a set.
 
-    >>> process_json_hashtags("{'climatechange', 'spaceweather'}")
-    {'climatechange', 'spaceweather'}
+    >>> hashtags_list = process_json_hashtags("{'climatechange', 'spaceweather'}")
+    >>> all(item in {'climatechange', 'spaceweather'} for item in hashtags_list)
+    True
     >>> process_json_hashtags("set()")
     set()
     """
@@ -183,7 +180,6 @@ def json_to_tweets(input_file: str) -> list:
             # Loads the json file to a dictionary
             tweet_dict = json.loads(json_obj)
 
-            # temp_date = process_json_date(tweet_dict['date'])
             # Processed the json hashtags from a string to a set
             temp_hashtags = process_json_hashtags(tweet_dict['hashtags'])
 
@@ -225,25 +221,35 @@ def json_make_lowercase(input_file: str, output_file: str) -> None:
     out.close()
 
 
-def shrink_dataset(input_file: str, output_file: str, trun_amt: int) -> None:
+def shrink_dataset(input_file: str, output_file: str, shrink_amt: int) -> None:
     """
-    Takes an input jsonl file to be truncated and writes only
+    Takes an input jsonl file, shrinks by a factor given by shrink_amt while keeping the
+    date distribution of data relatively the same, and rewrites this shrunk dataset to a
+    new jsonl file.
     """
     # Open the output file to write to
     out = open(output_file, "w")
+
+    # Set a counter for shrinking
     count = 0
+
     # Opens the input file
     with open(input_file) as inp:
+
         # Reads in each json object on each line of the input_file
         for json_obj in inp:
 
-            if count % trun_amt == 0:
+            # Only writes the json object to a new file if count is a multiple of shrink_amt
+            # This is done to keep the distribution of data even as the dataset is shortened
+            if count % shrink_amt == 0:
+
                 # Loads the json file to a dictionary
                 tweet_dict = json.loads(json_obj)
 
                 temp_tweet = tweet_class.Tweet(tweet_dict['text'], tweet_dict['hashtags'],
                                                tweet_dict['state'], tweet_dict['date'])
 
+                # Turn the tweet to a json object
                 json_tweet = json.dumps(temp_tweet.__dict__, sort_keys=True, default=str)
 
                 # Write to the outfile
@@ -266,10 +272,10 @@ if __name__ == '__main__':
 
     import python_ta
 
-    # Please note: E9998 (Checks for IO functions since they are usually not allowed in the course)
-    # is disabled since this file must read and write files.
     python_ta.check_all(config={
         'extra-imports': ['twarc', 'datetime', 'python_ta.contracts', 'tweet_class', 'json'],
         'max-line-length': 100,
-        'disable': ['R1705', 'C0200', 'E9998']
+        'allowed-io': ['shrink_dataset', 'filter_tweets', 'json_make_lowercase', 'json_to_tweets',
+                       'get_location'],
+        'disable': ['R1705', 'C0200']
     })
