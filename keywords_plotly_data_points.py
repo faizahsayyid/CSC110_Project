@@ -138,6 +138,11 @@ def key_phrases_to_data_points(tweets: List[Tweet], num_key_phrases: int) -> \
 
     key_phrases = find_key_phrases(tweets, num_key_phrases)
 
+    # [('climate', 'change'), ('climatechange',), ('global', 'warming'), ('world',),
+    #                ('science',), ('trump',), ('years',), ('energy',), ('scientists',), ('environment',),
+    #                ('news',), ('water',), ('earth',), ('realdonaldtrump',), ('action',), ('today',),
+    #                ('planet',)]
+
     for phrase in key_phrases:
         str_phrase = ' '.join(phrase)
         data_points_dict_so_far[str_phrase] = data_points_key_phrase(tweets, phrase)
@@ -171,17 +176,17 @@ def date_state_to_phrase_occurrences(tweets: List[Tweet], search_phrase: tuple) 
 
     # ACCUMULATOR d_s_to_occs_so_far dictionary of {(state, date): occurrences}
     # initial value: all the combinations of dates and states to zero
-    d_s_to_occs_so_far = {(date, state): 0 for date in date_to_t for state in STATES}
-
-    for date_state in d_s_to_occs_so_far:
-
-        date, state = date_state
-
-        for tweet in date_to_t[date]:
-            if date_state in d_s_to_occs_so_far and (tweet.state == state):
-                d_s_to_occs_so_far[date_state] += phrase_occurrences_in_tweet(tweet, search_phrase)
-
-    return d_s_to_occs_so_far
+    # d_s_to_occs_so_far = {(date, state): 0 for date in date_to_t for state in STATES}
+    #
+    # for date_state in d_s_to_occs_so_far:
+    #
+    #     date, state = date_state
+    #
+    #     for tweet in date_to_t[date]:
+    #         if date_state in d_s_to_occs_so_far and (tweet.state == state):
+    #             d_s_to_occs_so_far[date_state] += phrase_occurrences_in_tweet(tweet, search_phrase)
+    #
+    # return d_s_to_occs_so_far
 
     # d_s_to_occs_so_far = {}
     #
@@ -193,6 +198,17 @@ def date_state_to_phrase_occurrences(tweets: List[Tweet], search_phrase: tuple) 
     #         d_s_to_occs_so_far[date_state] = phrase_occurrences_in_tweet(tweet, search_phrase)
     #
     # return d_s_to_occs_so_far
+
+    d_s_to_occs_so_far = {}
+
+    for tweet in tweets:
+        date_state = (tweet.date, tweet.state)
+        if date_state in d_s_to_occs_so_far and phrase_occurrences_in_tweet(tweet, search_phrase):
+            d_s_to_occs_so_far[date_state] += 1
+        elif date_state not in d_s_to_occs_so_far:
+            d_s_to_occs_so_far[date_state] = 1
+
+    return d_s_to_occs_so_far
 
 
 # ==================================================================================================
@@ -246,7 +262,7 @@ def data_points(data_dict: Dict[Tuple[str, str], int]) -> Tuple[List[str], List[
 # Function for finding the number of times a a phrase occurs in a tweet
 # ==================================================================================================
 
-def phrase_occurrences_in_tweet(tweet: Tweet, search_phrase: tuple) -> int:
+def phrase_occurrences_in_tweet(tweet: Tweet, search_phrase: tuple) -> bool:
     """Return number of times a a phrase occurs in a tweet
 
     Phrases includes:
@@ -268,19 +284,19 @@ def phrase_occurrences_in_tweet(tweet: Tweet, search_phrase: tuple) -> int:
 
     word_list = tweet_to_words(tweet)
 
-    bigrams = list(nltk.bigrams(word_list))
+    # bigrams = list(nltk.bigrams(word_list))
+    #
+    # trigrams = list(nltk.trigrams(word_list))
+    #
+    # tuple_word_list = [tuple([word]) for word in word_list]
+    #
+    # phrases = tuple_word_list + bigrams + trigrams
+    #
+    # for phrase in phrases:
+    #     if phrase == search_phrase:
+    #         occurrences_so_far += 1
 
-    trigrams = list(nltk.trigrams(word_list))
-
-    tuple_word_list = [tuple([word]) for word in word_list]
-
-    phrases = tuple_word_list + bigrams + trigrams
-
-    for phrase in phrases:
-        if phrase == search_phrase:
-            occurrences_so_far += 1
-
-    return occurrences_so_far
+    return all([word in word_list for word in search_phrase])
 
 
 # ==================================================================================================
@@ -530,7 +546,7 @@ def run_example() -> None:
     """ Example of find_key_phrases on the file:
                 Year/Fall 2020/csc110/assignments/CSC110_Project/Datasets/Samples
     """
-    tweets = json_to_tweets()
+    tweets = json_to_tweets('Datasets/Samples/sampleHarvardProcessedTweets.jsonl')
     key_phrases_tuples = find_key_phrases(tweets, 30)
 
     key_phrases = list_tuple_to_list_str(key_phrases_tuples)
@@ -562,8 +578,18 @@ def run_example() -> None:
     pprint(hashtags_to_data)
 
 
+def run_find_key_hashtags() -> None:
+    """..."""
+    path = '/Users/faizahsayyid/Documents/University Of Toronto/First Year/Fall 2020/csc110/miscellaneous/full_harvard_processed00.jsonl'
+    tweets = json_to_tweets(path)
+
+    key_phrases = key_phrases_to_data_points(tweets, 25)
+
+    pprint(key_phrases)
+
+
 if __name__ == '__main__':
-    run_example()
+    # run_find_key_hashtags()
 
     import doctest
     doctest.testmod()
