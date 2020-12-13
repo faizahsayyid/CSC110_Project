@@ -6,13 +6,12 @@ This module contains the ...
 """
 
 from typing import Set
-import datetime
 from dataclasses import dataclass
 
-states = ['AK', 'AL', 'AR', 'AS', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'GU', 'HI', 'IA', 'ID', 'IL', 'IN',
-          'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN', 'MO', 'MP', 'MS', 'MT', 'NA', 'NC', 'ND', 'NE', 'NH', 'NJ',
-          'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VI', 'VT', 'WA',
-          'WI', 'WV', 'WY']
+STATES = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA',
+          'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+          'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT',
+          'VA', 'WA', 'WV', 'WI', 'WY']
 
 
 @dataclass
@@ -25,18 +24,27 @@ class Tweet:
         - date: the date the tweet was tweeted
 
     Representation Invariants:
+        - self.text != ''
         - self.state in states
-        - [h[0] == '#' h for h in self.hashtags]
+        - self.text.islower()
+        - all(hashtag.islower() for hashtag in self.hashtags)
 
-    >>> tweet = Tweet({'#climatechange', '#climatechangehoax', '#globalwarming'}, 'CA', datetime.date(2015, 9, 14))
+    >>> tweet = Tweet('some text', {'#climatechange', '#climatechangehoax', '#globalwarming'}, 'CA', \
+    '2018-02-12')
     """
-
     text: str
     hashtags: Set[str]
     state: str
-    date: datetime.date
+    date: str
 
-    # def __init__(self, hashtags: Set[str], state: str, date: datetime.date):
-    #     self.hashtags = hashtags
-    #     self.state = state
-    #     self.date = date
+
+if __name__ == '__main__':
+
+    import python_ta
+
+    python_ta.check_all(config={
+        'extra-imports': ['typing', 'dataclasses'],
+        'allowed-io': [],
+        'max-line-length': 100,
+        'disable': ['R1705', 'C0200']
+    })

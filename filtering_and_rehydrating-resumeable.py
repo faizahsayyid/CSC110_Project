@@ -4,7 +4,7 @@ DATE: NOVEMBER 2020
 GROUP: COURTNEY AMM, FAIZAH SAYYID, POORVI SHARMA, TINA ZHANG
 """
 from twarc import Twarc
-import tweet_class_new
+import tweet_class
 import datetime
 import json
 import linecache
@@ -248,7 +248,7 @@ def filter_tweets(data: List[int]) -> None:
 
             for element in tweet["entities"]["hashtags"]:
                 temp_hashtags.add(element["text"])
-            temp_tweet = tweet_class_new.Tweet(tweet["full_text"], temp_hashtags, new_loc, temp_date)
+            temp_tweet = tweet_class.Tweet(tweet["full_text"], temp_hashtags, new_loc, temp_date)
 
             # convert tweets to json
             json_tweet = json.dumps(temp_tweet.__dict__, sort_keys=True, default=str)
@@ -291,6 +291,6 @@ def json_to_tweets():
             tweet_dict = json.loads(jsonObj)
             temp_date = process_json_date(tweet_dict['date'])
             temp_hashtags = process_json_hashtags(tweet_dict['hashtags'])
-            tweet_list.append(tweet_class_new.Tweet(tweet_dict['text'], temp_hashtags,
+            tweet_list.append(tweet_class.Tweet(tweet_dict['text'], temp_hashtags,
                                                 tweet_dict['state'], temp_date))
     return tweet_list
