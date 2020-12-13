@@ -22,13 +22,17 @@ import plotly.express as px
 import keywords_plotly_data_points as sk
 from rehydrate_and_filter_tweets import json_to_tweets
 
-tweets = json_to_tweets()
-data = sk.hashtags_to_data_points(tweets, 100)
-keys = list(data.keys())
+# TYPE IN THE PATH TO THE DOWNLOADED HARVARD DATASET HERE:
+data_set_processed = 'Datasets/Full Datasets/full_harvard_processed00.jsonl'
+key_phrase = 'climate change'
 
+tweets = json_to_tweets(data_set_processed)
+data = sk.hashtags_to_data_points(tweets, 1)
+keys = list(data.keys())
 
 animations = {}
 for value in keys:
+    # filter out the hashtags that have empty dates, locations, or occurrences
     if data[value][0] != [] and data[value][1] != [] and data[value][2] != []:
         animations[value] = px.choropleth(locations=data[value][1],
                                           color=data[value][2],
@@ -46,15 +50,16 @@ for value in keys:
                                           title="Empty",
                                           height=600
                                           )
-
+# create an empty dash application
 app = dash.Dash(__name__)
 
+# configure the layout of the applications, add dropdowns
 app.layout = html.Div([
     html.P("Select a keyword:"),
     dcc.Dropdown(
         id='selection',
         options=[{'label': x, 'value': x} for x in animations],
-        value=keys[1],
+        value=keys[0],
         placeholder="Select a key phrase"
     ),
     dcc.Graph(id="graph"),
@@ -66,7 +71,10 @@ app.layout = html.Div([
     Output("graph", "figure"),
     [Input("selection", "value")])
 def update_graph(input_data):
-    if input_data == None:
+    """Return and displays the map correspondent to the input from the dropdown.
+    Displays an empty map if there's no input
+    """
+    if input_data is None:
         px.choropleth(color_continuous_scale="Inferno",
                       locationmode='USA-states',
                       title="Empty",
