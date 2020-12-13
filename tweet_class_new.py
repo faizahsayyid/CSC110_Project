@@ -7,18 +7,18 @@ This module contains the ...
 
 from typing import Set
 import datetime
+
 from dataclasses import dataclass
 # internet solution https://stackoverflow.com/questions/8230315/how-to-json-serialize-sets
 from json import dumps, loads, JSONEncoder, JSONDecoder
 import pickle
 
-states = ['AK', 'AL', 'AR', 'AS', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'GU', 'HI', 'IA',
+states = ['AK', 'AL', 'AR', 'AS', 'AZ', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'GU', 'HI', 'IA',
           'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN', 'MO', 'MP', 'MS', 'MT',
           'NA', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'PR', 'RI',
           'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VI', 'VT', 'WA', 'WI', 'WV', 'WY']
 
 
-@dataclass
 class Tweet:
     """ A date type representing a tweet
 
@@ -28,18 +28,18 @@ class Tweet:
         - date: the date the tweet was tweeted
 
     Representation Invariants:
+        - self.text != ''
         - self.state in states
-        - [h[0] == '#' h for h in self.hashtags]
 
-    >>> tweet = Tweet({'#climatechange', '#climatechangehoax', '#globalwarming'}, 'CA', \
+    >>> tweet = Tweet('some text', {'#climatechange', '#climatechangehoax', '#globalwarming'}, 'CA', \
                     datetime.date(2015, 9, 14))
     """
     text: str
     hashtags: Set[str]
     state: str
-    date: datetime.date
+    date: str
 
-    def __init__(self, text: str, hashtags: Set[str], state: str, date: datetime.date):
+    def __init__(self, text: str, hashtags: Set[str], state: str, date: str):
         self.text = text
         self.hashtags = hashtags
         self.state = state

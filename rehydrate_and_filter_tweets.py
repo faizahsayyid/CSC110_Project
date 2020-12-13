@@ -26,7 +26,7 @@ t = Twarc(consumer_key,
           access_token_secret,
           tweet_mode="extended")
 
-states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DC", "DE", "FL", "GA",
+states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
           "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
           "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
           "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
@@ -46,11 +46,14 @@ states_dict = {'AL': 'AL', 'AK': 'AK', 'AZ': 'AZ', 'AR': 'AR', 'CA': 'CA', 'CO':
                'MO': 'MO', 'MT': 'MT', 'NE': 'NE', 'NV': 'NV', 'NH': 'NH', 'NJ': 'NJ', 'NM': 'NM', 'NY': 'NY',
                'NC': 'NC', 'ND': 'ND', 'OH': 'OH', 'OK': 'OK', 'OR': 'OR', 'PA': 'PA', 'RI': 'RI', 'SC': 'SC',
                'SD': 'SD', 'TN': 'TN', 'TX': 'TX', 'UT': 'UT', 'VT': 'VT', 'VA': 'VA', 'WA': 'WA', 'WV': 'WV',
-               'WI': 'WI', 'WY': 'WY', 'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
-               'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA', 'Hawaii': 'HI',
+               'WI': 'WI', 'WY': 'WY', 'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR',
+               'California': 'CA',
+               'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
+               'Hawaii': 'HI',
                'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA', 'Kansas': 'KS', 'Kentucky': 'KY',
                'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD', 'Massachusetts': 'MA', 'Michigan': 'MI',
-               'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO', 'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV',
+               'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO', 'Montana': 'MT', 'Nebraska': 'NE',
+               'Nevada': 'NV',
                'New Hampshire': 'NH', 'New Jersey': 'NJ', 'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC',
                'North Dakota': 'ND', 'Ohio': 'OH', 'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA',
                'Rhode Island': 'RI', 'South Carolina': 'SC', 'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX',
@@ -167,8 +170,21 @@ def json_to_tweets(input_file: str):
     with open(input_file) as f:
         for json_obj in f:
             tweet_dict = json.loads(json_obj)
-            temp_date = process_json_date(tweet_dict['date'])
+            # temp_date = process_json_date(tweet_dict['date'])
             temp_hashtags = process_json_hashtags(tweet_dict['hashtags'])
             tweet_list.append(tweet_class.Tweet(tweet_dict['text'], temp_hashtags,
-                                                tweet_dict['state'], temp_date))
+                                                tweet_dict['state'], tweet_dict['date']))
     return tweet_list
+
+
+def json_make_lowercase(input_file: str, output_file: str):
+    out = open(output_file, "w")
+    with open(input_file) as inp:
+        for json_obj in inp:
+            tweet_dict = json.loads(json_obj)
+            tweet_dict['text'] = tweet_dict['text'].lower()
+            tweet_dict['hashtags'] = tweet_dict['hashtags'].lower()
+            temp_tweet = tweet_class.Tweet(tweet_dict['text'], tweet_dict['hashtags'],
+                                           tweet_dict['state'], tweet_dict['date'])
+            json_tweet = json.dumps(temp_tweet.__dict__, sort_keys=True, default=str)
+            out.write(str(json_tweet) + "\n")
