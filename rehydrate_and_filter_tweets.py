@@ -21,16 +21,15 @@ function makes the text and hashtags of the tweets in the jsonl file lowercase, 
 the dataset by a given amount in such a way that the data is still evenly distributed.
 
 """
-import datetime
 import json
 from twarc import Twarc
 import tweet_class
 
-# FILL THESE OUT BEFORE ATTEMPTING TO USE THESE FUNCTIONS
-CONSUMER_KEY = 'lAWI9LDAMJPFT1HVChPsz2kCo'
-CONSUMER_SECRET = 'CyvpOXFjtdNVMR60WH3YWNewtYq6XPoKw71DhlTix9nrdpPd0h'
-ACCESS_TOKEN = '1322896303597211649-dQ6szuQeIFxpDzKwSZlCeLM6HFvPhq'
-ACCESS_TOKEN_SECRET = 'QPorDdlNYEqvXzN0jrorDrg5XwdUVatDJKmXNDtIp2kax'
+# FILL THESE OUT BEFORE ATTEMPTING TO USE filter_tweets
+CONSUMER_KEY = ''
+CONSUMER_SECRET = ''
+ACCESS_TOKEN = ''
+ACCESS_TOKEN_SECRET = ''
 
 # Creating a twarc instance to rehydrate and sort the ids
 T = Twarc(CONSUMER_KEY,
@@ -60,24 +59,19 @@ STATES_DICT = {'AL': 'AL', 'AK': 'AK', 'AZ': 'AZ', 'AR': 'AR', 'CA': 'CA', 'CO':
                'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV',
                'Wisconsin': 'WI', 'Wyoming': 'WY'}
 
-MONTHS = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, "Jul": 7, "Aug": 8, "Sep": 9,
-          "Oct": 10, "Nov": 11, "Dec": 12}
+MONTHS = {"Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06", "Jul": "07",
+          "Aug": "08", "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"}
 
 
-def get_date(tweetdate: str) -> datetime.date:
-    """Takes the String date of a tweet and processes it in to the datetime.time format.
-
-    Please note: at the time of writing this function and initially processing the data,
-    our tweet class took a datetime.time object for the date. This why this function was used.
-    As the as the later parts of the project developed, the tweet class was changed to a string,
-    making this function redundant. It here though to show how the data was initially processed.
+def get_date(tweetdate: str) -> str:
+    """Takes the String date of a tweet and processes it in to the string format used for the
+    tweet class
 
     >>> get_date("Wed Oct 11 20:19:24 +0000 2018")
-    datetime.date(2018, 10, 11)
-
+    '2018-10-11'
     """
     date_list = str.split(tweetdate)
-    return datetime.date(int(date_list[-1]), MONTHS[date_list[1]], int(date_list[2]))
+    return date_list[-1] + '-' + MONTHS[date_list[1]] + '-' + date_list[2]
 
 
 def get_location(location: str) -> str:
