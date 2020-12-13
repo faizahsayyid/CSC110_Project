@@ -2,8 +2,7 @@
 
 Module Description
 ==================
-This module contains the functions for finding all keywords in a list of tweets, and sorting them
-based on the number of time they occur.
+This module contains testing for the functions in the module keywords_plotly_data_points
 
 Copyright and Usage Information
 ===============================
@@ -44,8 +43,9 @@ TWEET4 = Tweet(
     date='2018-08-06',
     hashtags={'climatechange', 'renewableenergy'},
     state='CA',
-    text='when fossil fuels are burned, they release carbon dioxide and other greenhouse gases, which in turn trap '
-         'heat in our atmosphere, making them the primary contributors to global warming and climate change.'
+    text='when fossil fuels are burned, they release carbon dioxide and other greenhouse gases, '
+         'which in turn trap heat in our atmosphere, making them the primary contributors to '
+         'global warming and climate change.'
 )
 
 TWEET5 = Tweet(
@@ -75,7 +75,7 @@ def test_tweet_phrase_freq() -> None:
     actual = keywords_plotly_data_points.tweet_phrase_freq([TWEET2, TWEET3])
 
     expected = [(1, ('globe',)), (1, ('scientists',)), (2, ('globe', 'warming')),
-                (1, ('warming', 'scientists')),  (1, ('scientists', 'proven')),
+                (1, ('warming', 'scientists')), (1, ('scientists', 'proven')),
                 (1, ('proven', 'globe')), (1, ('globe', 'warming', 'scientists')),
                 (1, ('warming', 'scientists', 'proven')), (1, ('scientists', 'proven', 'globe')),
                 (1, ('proven', 'globe', 'warming'))]
@@ -101,8 +101,8 @@ def test_sorted_hashtag_freq() -> None:
 
     actual = keywords_plotly_data_points.sorted_hashtag_freq(LIST_OF_TWEETS)
 
-    expected = [(3, 'climatechange'), (2, 'globalwarming'), (1, 'scientists'), (1, 'renewableenergy'),
-                (1, 'climatechangeisreal')]
+    expected = [(3, 'climatechange'), (2, 'globalwarming'), (1, 'scientists'),
+                (1, 'renewableenergy'), (1, 'climatechangeisreal')]
 
     assert actual == expected
 
@@ -112,8 +112,8 @@ def test_get_all_hashtags() -> None:
 
     actual = keywords_plotly_data_points.get_all_hashtags(LIST_OF_TWEETS)
 
-    expected = ['climatechange', 'climatechangeisreal', 'globalwarming', 'climatechange', 'globalwarming',
-                'scientists', 'renewableenergy', 'climatechange']
+    expected = ['climatechange', 'climatechangeisreal', 'globalwarming', 'climatechange',
+                'globalwarming', 'scientists', 'renewableenergy', 'climatechange']
 
     assert set(actual) == set(expected)
 
@@ -146,3 +146,12 @@ def test_date_to_tweet() -> None:
 if __name__ == '__main__':
     import pytest
     pytest.main(['test_keywords_plotly_data_points.py', '-vv'])
+
+    import python_ta
+
+    python_ta.check_all(config={
+        'extra-imports': ['tweet_class_new', 'keywords_plotly_data_points'],
+        'allowed-io': [],
+        'max-line-length': 100,
+        'disable': ['R1705', 'C0200']
+    })
