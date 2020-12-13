@@ -2,8 +2,10 @@
 
 Module Description
 ==================
-This module contains the functions for finding all keywords in a list of tweets, and sorting them
-based on the number of time they occur.
+The module plotly_map_keyphrases:
+    - appends dictionary processed from module keywords_plotly_data_points using
+    key_phrases_to_data_points to dictionary of key phrases and map
+    - create a dash application of the dictionary and display it
 
 Copyright and Usage Information
 ===============================
@@ -24,8 +26,8 @@ from keywords_plotly_data_points import key_phrases_to_data_points
 from rehydrate_and_filter_tweets import json_to_tweets
 
 # TYPE IN THE PATH TO THE DOWNLOADED HARVARD DATASET HERE:
-DATA_SET_PROCESSED = 'Datasets/Full Datasets/full_harvard_processed00_trunc.jsonl'
-# TYPE IN THE NUMBER OF KEY PHRASES YOU WANT THE MAP TO DISPLAY:
+DATA_SET_PROCESSED = ''
+# TYPE IN THE NUMBER OF KEY PHRASES YOU WANT THE MAP TO DISPLAY, AROUND 5 IS RECOMMENDED:
 NUM_KEY_PHRASES = 5
 
 TWEET = json_to_tweets(DATA_SET_PROCESSED)
@@ -84,11 +86,7 @@ def update_graph(input_data: str) -> Any:
     Displays an empty map if there's no input.
     """
     if input_data is None:
-        return px.choropleth(color_continuous_scale="Inferno",
-                             locationmode='USA-states',
-                             title="Empty",
-                             scope="usa",
-                             height=600)
+        return px.choropleth(title="Awaiting Input...")
     else:
         return ANIMATIONS[input_data]
 

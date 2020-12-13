@@ -21,16 +21,15 @@ function makes the text and hashtags of the tweets in the jsonl file lowercase, 
 the dataset by a given amount in such a way that the data is still evenly distributed.
 
 """
-import datetime
 import json
 from twarc import Twarc
 import tweet_class
 
-# FILL THESE OUT BEFORE ATTEMPTING TO USE THESE FUNCTIONS
-CONSUMER_KEY = 'lAWI9LDAMJPFT1HVChPsz2kCo'
-CONSUMER_SECRET = 'CyvpOXFjtdNVMR60WH3YWNewtYq6XPoKw71DhlTix9nrdpPd0h'
-ACCESS_TOKEN = '1322896303597211649-dQ6szuQeIFxpDzKwSZlCeLM6HFvPhq'
-ACCESS_TOKEN_SECRET = 'QPorDdlNYEqvXzN0jrorDrg5XwdUVatDJKmXNDtIp2kax'
+# FILL THESE OUT BEFORE ATTEMPTING TO USE filter_tweets
+CONSUMER_KEY = ''
+CONSUMER_SECRET = ''
+ACCESS_TOKEN = ''
+ACCESS_TOKEN_SECRET = ''
 
 # Creating a twarc instance to rehydrate and sort the ids
 T = Twarc(CONSUMER_KEY,
@@ -60,87 +59,82 @@ STATES_DICT = {'AL': 'AL', 'AK': 'AK', 'AZ': 'AZ', 'AR': 'AR', 'CA': 'CA', 'CO':
                'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV',
                'Wisconsin': 'WI', 'Wyoming': 'WY'}
 
-MONTHS = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, "Jul": 7, "Aug": 8, "Sep": 9,
-          "Oct": 10, "Nov": 11, "Dec": 12}
+MONTHS = {"Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06", "Jul": "07",
+          "Aug": "08", "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"}
 
 
-def get_date(tweetdate: str) -> datetime.date:
-    """Takes the String date of a tweet and processes it in to the datetime.time format.
-
-    Please note: at the time of writing this function and initially processing the data,
-    our tweet class took a datetime.time object for the date. This why this function was used.
-    As the as the later parts of the project developed, the tweet class was changed to a string,
-    making this function redundant. It here though to show how the data was initially processed.
-
-    >>> get_date("Wed Oct 11 20:19:24 +0000 2018")
-    datetime.date(2018, 10, 11)
-
-    """
-    date_list = str.split(tweetdate)
-    return datetime.date(int(date_list[-1]), MONTHS[date_list[1]], int(date_list[2]))
-
-
-def get_location(location: str) -> str:
-    """Takes the full location of a tweet and returns the state postal ID of that tweet
-
-    >>> get_location("San Francisco, California")
-    'CA'
-    >>> get_location("Albany, NY, United States")
-    'NY'
-
-    """
-    for state in STATES_DICT:
-        if state in location:
-            return STATES_DICT[state]
-
-    print("error: Location not found")
-    return 'error'
-
-
-def filter_tweets(input_file: str, output_file: str) -> None:
-    """ This function reads a "dehydrated" list of tweet ids from the given file and dehydrates
-    and filters these tweets based on location. If the tweet's location is in a specific US state,
-    the tweet will be written to the given output file as a tweet object, with the Tweet's full
-    text, hashtags, State location, and date created all stored in this object.
-    """
-    out = open(output_file, "w")
-
-    # Go through tweet ids line by line and rehydrate the tweet,
-    # giving us a twarc tweet object
-    for tweet in T.hydrate(open(input_file)):
-        # Take the location out of the tweet object (based on the user's location)
-        temp_location = tweet["user"]["location"]
-
-        # Used to check if the first two letters are "RT", which indicates the tweet
-        # is a retweet
-        retweet = tweet["full_text"][:2]
-
-        # Checks if current tweet is from the US, has a state specified, and is not
-        # a retweet. If it matches those criteria, then it is processed
-        if any(state in temp_location for state in STATES_DICT) and retweet != "RT":
-            # Gets the state postal code for the tweet based on its location
-            new_loc = get_location(temp_location)
-
-            # Processes the date to a datetime.time object
-            temp_date = get_date(tweet["created_at"])
-
-            # Since the hashtags of a tweet are stored as a dict in a list, this loop
-            # loops through the list and adds the text of each hashtag to a set
-            temp_hashtags = set()
-            for element in tweet["entities"]["hashtags"]:
-                temp_hashtags.add(element["text"])
-
-            # Adds the tweet to a be in the format of our tweet data class objects
-            temp_tweet = tweet_class.Tweet(tweet["full_text"], temp_hashtags, new_loc, temp_date)
-
-            # Convert tweet objects to json objects in the format of a dictionary
-            json_tweet = json.dumps(temp_tweet.__dict__, sort_keys=True, default=str)
-
-            # Write each json object to a line in the jsonl file
-            out.write(str(json_tweet) + "\n")
-
-    # Closes the file we write to
-    out.close()
+# def get_date(tweetdate: str) -> str:
+#     """Takes the String date of a tweet and processes it in to the string format used for the
+#     tweet class
+#
+#     >>> get_date("Wed Oct 11 20:19:24 +0000 2018")
+#     '2018-10-11'
+#     """
+#     date_list = str.split(tweetdate)
+#     return date_list[-1] + '-' + MONTHS[date_list[1]] + '-' + date_list[2]
+#
+#
+# def get_location(location: str) -> str:
+#     """Takes the full location of a tweet and returns the state postal ID of that tweet
+#
+#     >>> get_location("San Francisco, California")
+#     'CA'
+#     >>> get_location("Albany, NY, United States")
+#     'NY'
+#
+#     """
+#     for state in STATES_DICT:
+#         if state in location:
+#             return STATES_DICT[state]
+#
+#     print("error: Location not found")
+#     return 'error'
+#
+#
+# def filter_tweets(input_file: str, output_file: str) -> None:
+#     """ This function reads a "dehydrated" list of tweet ids from the given file and dehydrates
+#     and filters these tweets based on location. If the tweet's location is in a specific US state,
+#     the tweet will be written to the given output file as a tweet object, with the Tweet's full
+#     text, hashtags, State location, and date created all stored in this object.
+#     """
+#     out = open(output_file, "w")
+#
+#     # Go through tweet ids line by line and rehydrate the tweet,
+#     # giving us a twarc tweet object
+#     for tweet in T.hydrate(open(input_file)):
+#         # Take the location out of the tweet object (based on the user's location)
+#         temp_location = tweet["user"]["location"]
+#
+#         # Used to check if the first two letters are "RT", which indicates the tweet
+#         # is a retweet
+#         retweet = tweet["full_text"][:2]
+#
+#         # Checks if current tweet is from the US, has a state specified, and is not
+#         # a retweet. If it matches those criteria, then it is processed
+#         if any(state in temp_location for state in STATES_DICT) and retweet != "RT":
+#             # Gets the state postal code for the tweet based on its location
+#             new_loc = get_location(temp_location)
+#
+#             # Processes the date to a datetime.time object
+#             temp_date = get_date(tweet["created_at"])
+#
+#             # Since the hashtags of a tweet are stored as a dict in a list, this loop
+#             # loops through the list and adds the text of each hashtag to a set
+#             temp_hashtags = set()
+#             for element in tweet["entities"]["hashtags"]:
+#                 temp_hashtags.add(element["text"])
+#
+#             # Adds the tweet to a be in the format of our tweet data class objects
+#             temp_tweet = tweet_class.Tweet(tweet["full_text"], temp_hashtags, new_loc, temp_date)
+#
+#             # Convert tweet objects to json objects in the format of a dictionary
+#             json_tweet = json.dumps(temp_tweet.__dict__, sort_keys=True, default=str)
+#
+#             # Write each json object to a line in the jsonl file
+#             out.write(str(json_tweet) + "\n")
+#
+#     # Closes the file we write to
+#     out.close()
 
 
 def process_json_hashtags(hashstring: str) -> set:
