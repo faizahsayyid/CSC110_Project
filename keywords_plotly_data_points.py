@@ -9,34 +9,6 @@ The module keywords_plotly_data_points:
     a particular date
     - Organizes the above data into data points formatted for plotly
 
-Find keywords/phrases and key hashtags:
-
-The first step to finding keywords was to separated the tweet text in to a list of words, removing
-words that are obviously not keywords, such as 'the' 'and', 'is', etc, as well as punctuation. This
-was done in our function tweets_to_word using nltk.word_tokenize, nltk.sent_tokenize, nltk.corpus.stopwords,
-as well as the hard coded constants PUNCTUATION, and OTHER. Next, in our function get_relative_frequencies,
-key phrases/collocations were founds using nltk.collocations.BigramCollocationFinder and
-nltk.collocations.TrigramCollocationFinder. Bi-grams are two word combinations, while trigrams are three word
-combinations. Finally all of single words (excluding words that aren't nouns using nltk.pos_tag), bi-grams, and
-trigrams are ranked by frequency to find the keywords (with in the same function). All of this was put together
-in the function find_key_phrases.
-
-A similar approach was taken for find_key_hashtags. The first two steps, turning text into a list of words,
-and finding the bi-grams and trigrams were skipped. Instead we simply gathered all the hashtags and found their
-frequencies.
-
-Date, State to Keyword Occurrences & Plotly Data Points:
-
-Having found the keywords and key hashtags, we then found their prevalence in each state on particular dates.
-To do this we found all the dates that tweets were tweeted from our data (in our function date_to_tweet), and used
-the hard coded constant STATES to get all the combinations of dates and states. Then, we iterated through each
-combination to find the prevalence of a given keyword in date_state_to_phrase_occurrences and
-date_state_to_hashtag_pop. This gave us a dictionary in the form {(date, state), occurrences}.
-
-From there, we converted the data from this format to one supported by plotly, which is three lists, one for each of
-dates, states, and occurrences where for index i (list1[i], list2[i], list3[i]) corresponds to a single data point.
-This was done in our function data_points.
-
 
 Copyright and Usage Information
 ===============================
@@ -47,13 +19,13 @@ prohibited.
 
 This file is Copyright (c) 2020 Faizah Sayyid, Tina Zhang, Poorvi Sharma, and Courtney Amm.
 """
+from typing import List, Dict, Tuple, Any
+from pprint import pprint
 import nltk
 from nltk import collocations
 from nltk.corpus import stopwords
 from tweet_class_new import Tweet
-from typing import List, Dict, Tuple, Any
 from rehydrate_and_filter_tweets import json_to_tweets
-from pprint import pprint
 
 PUNCTUATION = ['.', ',', '!', '?', ';', ':', "'", '‘', '’', '“', '``', "''", '-', '”', '&', '/',
                '#', '|', '--', ')', '(', '*', '....', '=']
@@ -61,9 +33,10 @@ PUNCTUATION = ['.', ',', '!', '?', ';', ':', "'", '‘', '’', '“', '``', "''
 OTHER = ['@', 'https', "'s", 'u', '...', '..', '%', '$', '—', '–', '\u2066', "'ve", "'re", "'m",
          "n't", 'the…']
 
-STATES = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS',
-          'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC',
-          'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY']
+STATES = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA',
+          'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+          'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT',
+          'VA', 'WA', 'WV', 'WI', 'WY']
 
 
 # ==================================================================================================
@@ -105,20 +78,30 @@ def date_state_to_hashtag_pop(tweets: List[Tweet], hashtag: str) -> Dict[Tuple[s
     """Return a dictionary where the keys are a tuples of dates and states (dates are strings),
     and the corresponding values is the popularity of the given hashtag in that state at that time
     """
-    date_to_t = date_to_tweet(tweets)
+    # date_to_t = date_to_tweet(tweets)
 
     # ACCUMULATOR d_s_to_occs_so_far dictionary of {(state, date): popularity}
-    # initial value: all the combinations of dates and states to zero
-    d_s_to_hashtag_pop = {(date, state): 0 for date in date_to_t for state in STATES}
+    d_s_to_hashtag_pop = {}
 
-    for date_state in d_s_to_hashtag_pop:
-        date, state = date_state
+    # {(date, state): 0 for date in date_to_t for state in STATES}
 
-        for tweet in date_to_t[date]:
+    # for date_state in d_s_to_hashtag_pop:
+    #     date, state = date_state
+    #
+    #     for tweet in date_to_t[date]:
+    #
+    #         if hashtag in tweet.hashtags and (tweet.state == state):
+    #             if date_state in d_s_to_hashtag_pop:
+    #                 d_s_to_hashtag_pop[date_state] += 1
 
-            if hashtag in tweet.hashtags and (tweet.state == state):
-                if date_state in d_s_to_hashtag_pop:
-                    d_s_to_hashtag_pop[date_state] += 1
+    # d_s_to_occs_so_far = {}
+    #
+    for tweet in tweets:
+        date_state = (tweet.date, tweet.state)
+        if (date_state in d_s_to_hashtag_pop) and (hashtag in tweet.hashtags):
+            d_s_to_hashtag_pop[date_state] += 1
+        elif (date_state not in d_s_to_hashtag_pop) and (hashtag in tweet.hashtags):
+            d_s_to_hashtag_pop[date_state] = 1
 
     return d_s_to_hashtag_pop
 
@@ -138,11 +121,6 @@ def key_phrases_to_data_points(tweets: List[Tweet], num_key_phrases: int) -> \
 
     key_phrases = find_key_phrases(tweets, num_key_phrases)
 
-    # [('climate', 'change'), ('climatechange',), ('global', 'warming'), ('world',),
-    #                ('science',), ('trump',), ('years',), ('energy',), ('scientists',), ('environment',),
-    #                ('news',), ('water',), ('earth',), ('realdonaldtrump',), ('action',), ('today',),
-    #                ('planet',)]
-
     for phrase in key_phrases:
         str_phrase = ' '.join(phrase)
         data_points_dict_so_far[str_phrase] = data_points_key_phrase(tweets, phrase)
@@ -150,7 +128,7 @@ def key_phrases_to_data_points(tweets: List[Tweet], num_key_phrases: int) -> \
     return data_points_dict_so_far
 
 
-def data_points_key_phrase(tweets: List[Tweet], search_phrase) \
+def data_points_key_phrase(tweets: List[Tweet], search_phrase: tuple) \
         -> Tuple[List[str], List[str], List[int]]:
     """Return a list of lists where each corresponding index in the lists counts as one data point
     for a plotly map animation that displays number of occurrences of the search_phrase for each
@@ -165,47 +143,21 @@ def data_points_key_phrase(tweets: List[Tweet], search_phrase) \
     return data_points(d_s_to_occs)
 
 
-def date_state_to_phrase_occurrences(tweets: List[Tweet], search_phrase: tuple) \
-        -> Dict[Tuple[str, str], int]:
+def date_state_to_phrase_occurrences(tweets: List[Tweet], search_phrase: tuple) -> \
+        Dict[Tuple[str, str], int]:
     """Return a dictionary where the keys are a tuples of dates and states (dates are strings),
     and the corresponding values are the number of times the search_phrase occurs in every tweet
     that was tweeted on that date and in that state
     """
-
-    date_to_t = date_to_tweet(tweets)
-
     # ACCUMULATOR d_s_to_occs_so_far dictionary of {(state, date): occurrences}
-    # initial value: all the combinations of dates and states to zero
-    # d_s_to_occs_so_far = {(date, state): 0 for date in date_to_t for state in STATES}
-    #
-    # for date_state in d_s_to_occs_so_far:
-    #
-    #     date, state = date_state
-    #
-    #     for tweet in date_to_t[date]:
-    #         if date_state in d_s_to_occs_so_far and (tweet.state == state):
-    #             d_s_to_occs_so_far[date_state] += phrase_occurrences_in_tweet(tweet, search_phrase)
-    #
-    # return d_s_to_occs_so_far
-
-    # d_s_to_occs_so_far = {}
-    #
-    # for tweet in tweets:
-    #     date_state = (tweet.date, tweet.state)
-    #     if date_state in d_s_to_occs_so_far:
-    #         d_s_to_occs_so_far[date_state] += phrase_occurrences_in_tweet(tweet, search_phrase)
-    #     elif date_state not in d_s_to_occs_so_far:
-    #         d_s_to_occs_so_far[date_state] = phrase_occurrences_in_tweet(tweet, search_phrase)
-    #
-    # return d_s_to_occs_so_far
-
     d_s_to_occs_so_far = {}
 
     for tweet in tweets:
         date_state = (tweet.date, tweet.state)
         if date_state in d_s_to_occs_so_far and phrase_occurrences_in_tweet(tweet, search_phrase):
             d_s_to_occs_so_far[date_state] += 1
-        elif date_state not in d_s_to_occs_so_far:
+        elif (date_state not in d_s_to_occs_so_far) and \
+                phrase_occurrences_in_tweet(tweet, search_phrase):
             d_s_to_occs_so_far[date_state] = 1
 
     return d_s_to_occs_so_far
@@ -263,7 +215,7 @@ def data_points(data_dict: Dict[Tuple[str, str], int]) -> Tuple[List[str], List[
 # ==================================================================================================
 
 def phrase_occurrences_in_tweet(tweet: Tweet, search_phrase: tuple) -> bool:
-    """Return number of times a a phrase occurs in a tweet
+    """Return whether or no the phrase occurs in the tweet
 
     Phrases includes:
     - uni-grams - single words
@@ -273,28 +225,12 @@ def phrase_occurrences_in_tweet(tweet: Tweet, search_phrase: tuple) -> bool:
     >>> t = Tweet(text='what is life. life is meaningless. meaningless is life.', hashtags=set(), \
       state='ME', date='2018-02-12')
     >>> phrase_occurrences_in_tweet(t, ('life',))
-    3
+    True
     >>> phrase_occurrences_in_tweet(t, ('life', 'meaningless'))
-    1
+    True
     """
 
-    # ACCUMULATOR occurrences_so_far keeps track of the # of times search_phrase occurs
-    # in the tweet
-    occurrences_so_far = 0
-
     word_list = tweet_to_words(tweet)
-
-    # bigrams = list(nltk.bigrams(word_list))
-    #
-    # trigrams = list(nltk.trigrams(word_list))
-    #
-    # tuple_word_list = [tuple([word]) for word in word_list]
-    #
-    # phrases = tuple_word_list + bigrams + trigrams
-    #
-    # for phrase in phrases:
-    #     if phrase == search_phrase:
-    #         occurrences_so_far += 1
 
     return all([word in word_list for word in search_phrase])
 
@@ -542,12 +478,12 @@ def list_tuple_to_list_str(list_of_tuple: List[tuple]) -> List[str]:
 # Example
 # ==================================================================================================
 
-def run_example() -> None:
-    """ Example of find_key_phrases on the file:
-                Year/Fall 2020/csc110/assignments/CSC110_Project/Datasets/Samples
+def run_example(file_path: str) -> None:
+    """ Example of functions in the module
+    file_path should be to a jsonl file containing tweets
     """
-    tweets = json_to_tweets('Datasets/Samples/sampleHarvardProcessedTweets.jsonl')
-    key_phrases_tuples = find_key_phrases(tweets, 30)
+    tweets = json_to_tweets(file_path)
+    key_phrases_tuples = find_key_phrases(tweets, 5)
 
     key_phrases = list_tuple_to_list_str(key_phrases_tuples)
 
@@ -557,15 +493,12 @@ def run_example() -> None:
 
     print()
     print('Key Hashtags:')
-    pprint(find_key_hashtags(tweets, 10))
+    pprint(find_key_hashtags(tweets, 5))
 
     print()
     print('Data Points (key phrase  - "climate change"):')
     data = data_points_key_phrase(tweets, ('climate', 'change'))
     pprint(data)
-
-    print()
-    print(sum(data[2]))
 
     print()
     print('Key Phrases to Data Points:')
@@ -578,18 +511,16 @@ def run_example() -> None:
     pprint(hashtags_to_data)
 
 
-def run_find_key_hashtags() -> None:
-    """..."""
-    path = '/Users/faizahsayyid/Documents/University Of Toronto/First Year/Fall 2020/csc110/miscellaneous/full_harvard_processed00.jsonl'
-    tweets = json_to_tweets(path)
-
-    key_phrases = key_phrases_to_data_points(tweets, 25)
-
-    pprint(key_phrases)
-
-
 if __name__ == '__main__':
-    # run_find_key_hashtags()
 
     import doctest
     doctest.testmod()
+
+    import python_ta
+    python_ta.check_all(config={
+        'extra-imports': ['nltk', 'tweet_class_new', 'typing', 'rehydrate_and_filter_tweets',
+                          'pprint', 'nltk.corpus'],
+        'allowed-io': ['run_example'],
+        'max-line-length': 100,
+        'disable': ['R1705', 'C0200']
+    })
