@@ -6,14 +6,12 @@ This module contains the ...
 """
 
 from typing import Set
-import datetime
-
 from dataclasses import dataclass
 
-STATES = ['AK', 'AL', 'AR', 'AS', 'AZ', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'GU', 'HI', 'IA',
-          'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN', 'MO', 'MP', 'MS', 'MT',
-          'NA', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'PR', 'RI',
-          'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VI', 'VT', 'WA', 'WI', 'WV', 'WY']
+STATES = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA',
+          'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+          'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT',
+          'VA', 'WA', 'WV', 'WI', 'WY']
 
 
 @dataclass
@@ -28,11 +26,25 @@ class Tweet:
     Representation Invariants:
         - self.text != ''
         - self.state in states
+        - self.text.islower()
+        - all(hashtag.islower() for hashtag in self.hashtags)
 
     >>> tweet = Tweet('some text', {'#climatechange', '#climatechangehoax', '#globalwarming'}, 'CA', \
-                    datetime.date(2015, 9, 14))
+    '2018-02-12')
     """
     text: str
     hashtags: Set[str]
     state: str
     date: str
+
+
+if __name__ == '__main__':
+
+    import python_ta
+
+    python_ta.check_all(config={
+        'extra-imports': ['typing', 'dataclasses'],
+        'allowed-io': [],
+        'max-line-length': 100,
+        'disable': ['R1705', 'C0200']
+    })
