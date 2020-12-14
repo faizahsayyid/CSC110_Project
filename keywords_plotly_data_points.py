@@ -449,9 +449,10 @@ def run_example(file_path: str) -> None:
     """
     tweets = json_to_tweets(file_path)
 
-    # Try with a low amount of tweets like 50-150, use tweet[:50] for this
+    # Change this number to get more or less tweets
+    num_tweets = 50
 
-    key_phrases_tuples = find_key_phrases(tweets, 5)
+    key_phrases_tuples = find_key_phrases(tweets[:num_tweets], 5)
 
     key_phrases = list_tuple_to_list_str(key_phrases_tuples)
 
@@ -461,21 +462,21 @@ def run_example(file_path: str) -> None:
 
     print()
     print('Key Hashtags:')
-    pprint(find_key_hashtags(tweets, 5))
+    pprint(find_key_hashtags(tweets[:num_tweets], 5))
 
     print()
     print('Data Points (key phrase  - "climate change"):')
-    data = data_points_key_phrase(tweets, ('climate', 'change'))
+    data = data_points_key_phrase(tweets[:num_tweets], ('climate', 'change'))
     pprint(data)
 
     print()
     print('Key Phrases to Data Points:')
-    key_phrases_to_data = key_phrases_to_data_points(tweets, 5)
+    key_phrases_to_data = key_phrases_to_data_points(tweets[:num_tweets], 5)
     pprint(key_phrases_to_data)
 
     print()
     print('Key Hashtags to Data Points')
-    hashtags_to_data = hashtags_to_data_points(tweets, 5)
+    hashtags_to_data = hashtags_to_data_points(tweets[:num_tweets], 5)
     pprint(hashtags_to_data)
 
 

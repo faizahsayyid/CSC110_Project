@@ -8,6 +8,7 @@ python-ta
 plotly
 ploty-express
 dash
+pandas
 
 # Word Processing
 nltk
