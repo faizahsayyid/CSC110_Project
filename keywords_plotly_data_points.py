@@ -33,11 +33,6 @@ PUNCTUATION = ['.', ',', '!', '?', ';', ':', "'", '‘', '’', '“', '``', "''
 OTHER = ['@', 'https', "'s", 'u', '...', '..', '%', '$', '—', '–', '\u2066', "'ve", "'re", "'m",
          "n't", 'the…']
 
-STATES = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA',
-          'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
-          'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT',
-          'VA', 'WA', 'WV', 'WI', 'WY']
-
 
 # ==================================================================================================
 # Functions for getting the data points for our plotly graph (for hashtags)
@@ -453,7 +448,11 @@ def run_example(file_path: str) -> None:
     file_path should be to a jsonl file containing tweets
     """
     tweets = json_to_tweets(file_path)
-    key_phrases_tuples = find_key_phrases(tweets, 5)
+
+    # Change this number to get more or less tweets
+    num_tweets = 50
+
+    key_phrases_tuples = find_key_phrases(tweets[:num_tweets], 5)
 
     key_phrases = list_tuple_to_list_str(key_phrases_tuples)
 
@@ -463,21 +462,21 @@ def run_example(file_path: str) -> None:
 
     print()
     print('Key Hashtags:')
-    pprint(find_key_hashtags(tweets, 5))
+    pprint(find_key_hashtags(tweets[:num_tweets], 5))
 
     print()
     print('Data Points (key phrase  - "climate change"):')
-    data = data_points_key_phrase(tweets, ('climate', 'change'))
+    data = data_points_key_phrase(tweets[:num_tweets], ('climate', 'change'))
     pprint(data)
 
     print()
     print('Key Phrases to Data Points:')
-    key_phrases_to_data = key_phrases_to_data_points(tweets, 5)
+    key_phrases_to_data = key_phrases_to_data_points(tweets[:num_tweets], 5)
     pprint(key_phrases_to_data)
 
     print()
     print('Key Hashtags to Data Points')
-    hashtags_to_data = hashtags_to_data_points(tweets, 5)
+    hashtags_to_data = hashtags_to_data_points(tweets[:num_tweets], 5)
     pprint(hashtags_to_data)
 
 
@@ -488,7 +487,7 @@ if __name__ == '__main__':
 
     import python_ta
     python_ta.check_all(config={
-        'extra-imports': ['nltk', 'tweet_class_new', 'typing', 'rehydrate_and_filter_tweets',
+        'extra-imports': ['nltk', 'tweet_class', 'typing', 'rehydrate_and_filter_tweets',
                           'pprint', 'nltk.corpus'],
         'allowed-io': ['run_example'],
         'max-line-length': 100,
