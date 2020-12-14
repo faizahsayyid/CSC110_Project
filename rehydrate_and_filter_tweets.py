@@ -22,21 +22,21 @@ the dataset by a given amount in such a way that the data is still evenly distri
 
 """
 import json
-from twarc import Twarc
+# from twarc import Twarc
 import tweet_class
 
 # FILL THESE OUT BEFORE ATTEMPTING TO USE filter_tweets
-CONSUMER_KEY = ''
-CONSUMER_SECRET = ''
-ACCESS_TOKEN = ''
-ACCESS_TOKEN_SECRET = ''
-
-# Creating a twarc instance to rehydrate and sort the ids
-T = Twarc(CONSUMER_KEY,
-          CONSUMER_SECRET,
-          ACCESS_TOKEN,
-          ACCESS_TOKEN_SECRET,
-          tweet_mode="extended")
+# CONSUMER_KEY = ''
+# CONSUMER_SECRET = ''
+# ACCESS_TOKEN = ''
+# ACCESS_TOKEN_SECRET = ''
+#
+# # Creating a twarc instance to rehydrate and sort the ids
+# T = Twarc(CONSUMER_KEY,
+#           CONSUMER_SECRET,
+#           ACCESS_TOKEN,
+#           ACCESS_TOKEN_SECRET,
+#           tweet_mode="extended")
 
 STATES_DICT = {'AL': 'AL', 'AK': 'AK', 'AZ': 'AZ', 'AR': 'AR', 'CA': 'CA', 'CO': 'CO', 'CT': 'CT',
                'DE': 'DE', 'FL': 'FL', 'GA': 'GA', 'HI': 'HI', 'ID': 'ID', 'IL': 'IL', 'IN': 'IN',
@@ -140,10 +140,7 @@ MONTHS = {"Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun"
 def process_json_hashtags(hashstring: str) -> set:
     """ Takes a string of hashtags in the format "{'hash_tag_name', 'hash_tag_name_2'}"
     and returns the hashtags as a set.
-
-    >>> hashtags_list = process_json_hashtags("{'climatechange', 'spaceweather'}")
-    >>> all(item in {'climatechange', 'spaceweather'} for item in hashtags_list)
-    True
+    
     >>> process_json_hashtags("set()")
     set()
     """
