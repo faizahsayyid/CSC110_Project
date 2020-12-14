@@ -1,4 +1,4 @@
-"""CSC110 Project: Plotly Map: Key Phrases
+"""CSC110 Project: Main - Plotly Map: Key Phrases
 
 Module Description
 ==================
