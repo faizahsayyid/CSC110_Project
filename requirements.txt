@@ -12,6 +12,7 @@ pandas
 
 # Word Processing
 nltk
+numpy
 
 # Twitter API Handling
 twarc
