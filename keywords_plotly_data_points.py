@@ -448,6 +448,9 @@ def run_example(file_path: str) -> None:
     file_path should be to a jsonl file containing tweets
     """
     tweets = json_to_tweets(file_path)
+
+    # Try with a low amount of tweets like 50-150, use tweet[:50] for this
+
     key_phrases_tuples = find_key_phrases(tweets, 5)
 
     key_phrases = list_tuple_to_list_str(key_phrases_tuples)
